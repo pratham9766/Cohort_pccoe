@@ -1,0 +1,8 @@
+{
+  "project_id": "appgprj_6a8442bad5a88191ae87c6bd0b67b8e0",
+  "framework": "vite",
+  "build": {
+    "command": "pnpm build",
+    "output": "dist"
+  }
+}

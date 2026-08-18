@@ -1,10 +1,10 @@
 import { Chrome, Compass, LockKeyhole, Users } from 'lucide-react';
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/Button.jsx';
 import { useAuth } from '@/hooks/useAuth.js';
 import { signInWithGoogle } from '@/lib/auth.js';
-import { hasSupabaseConfig } from '@/lib/supabase.js';
+import { hasSupabaseConfig, supabaseConfigError } from '@/lib/supabase.js';
 import { useNotificationStore } from '@/stores/notificationStore.js';
 import { ToastViewport } from '@/components/ui/Toast.jsx';
 
@@ -16,12 +16,15 @@ export default function LoginPage() {
   useEffect(() => {
     if (!loading && user?.is_onboarded) navigate('/dashboard', { replace: true });
     if (!loading && user && !user.is_onboarded) navigate('/onboarding', { replace: true });
-  }, [loading, navigate, user]);
+    const params = new URLSearchParams(window.location.search);
+    const error = params.get('error');
+    if (error) addToast(error === 'unauthorized_domain' ? 'Use your PCCOE institutional Google account.' : error, 'error');
+  }, [addToast, loading, navigate, user]);
 
   async function login() {
     try {
       if (!hasSupabaseConfig) {
-        addToast('Demo mode is active. Add Supabase env vars for Google OAuth.', 'info');
+        addToast(supabaseConfigError, 'error');
         return;
       }
       await signInWithGoogle();
@@ -46,6 +49,7 @@ export default function LoginPage() {
           <span><Compass size={16} aria-hidden="true" /> Campus map</span>
         </div>
         <Button icon={Chrome} onClick={login}>Sign in with Google</Button>
+        <Button as={Link} to="/demo" variant="ghost">Try demo login</Button>
         <small className="muted">Restricted to @pccoe.org and @pccoepune.org accounts.</small>
       </section>
       <ToastViewport />

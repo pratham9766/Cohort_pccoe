@@ -1,11 +1,18 @@
 import { Award, Users } from 'lucide-react';
 import { ProfileSummary } from '@/components/features/profile/ProfileSummary.jsx';
 import { Card } from '@/components/ui/Card.jsx';
-import { currentUser } from '@/lib/constants.js';
 import { useAuthStore } from '@/stores/authStore.js';
 
 export default function ProfilePage() {
-  const user = useAuthStore((state) => state.user) ?? currentUser;
+  const user = useAuthStore((state) => state.user);
+  if (!user) {
+    return (
+      <section className="page stack">
+        <Card><p className="muted">Profile is unavailable until you sign in with Supabase.</p></Card>
+      </section>
+    );
+  }
+
   return (
     <section className="page stack">
       <ProfileSummary user={user} />

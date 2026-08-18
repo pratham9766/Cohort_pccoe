@@ -1,9 +1,8 @@
 import { Paperclip, Send, Smile } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button.jsx';
-import { messages as fallbackMessages } from '@/lib/constants.js';
 
-export function ChatWindow({ messages = fallbackMessages, title = 'GDGC Core Team', onSend }) {
+export function ChatWindow({ messages = [], title = 'Conversation', onSend }) {
   const [draft, setDraft] = useState('');
 
   function submit(event) {
@@ -17,15 +16,16 @@ export function ChatWindow({ messages = fallbackMessages, title = 'GDGC Core Tea
     <section className="chat-window glass-card">
       <header>
         <strong>{title}</strong>
-        <span className="muted">E2E encrypted · online</span>
+        <span className="muted">Private conversation</span>
       </header>
       <div className="message-thread">
         {messages.map((message) => (
           <article key={message.id} className={message.mine ? 'message mine' : 'message'}>
-            <p>{message.body ?? '[Encrypted payload ready for client decrypt]'}</p>
-            <time>{message.time ?? 'now'}</time>
+            <p>{message.body ?? message.content ?? '[Encrypted message]'}</p>
+            <time>{message.time ?? message.created_at ?? 'now'}</time>
           </article>
         ))}
+        {!messages.length ? <p className="muted">No messages yet.</p> : null}
       </div>
       <form className="chat-input" onSubmit={submit}>
         <Button variant="ghost" icon={Smile} aria-label="Emoji" />

@@ -4,7 +4,7 @@ export const allowedEmailDomains = (import.meta.env.VITE_ALLOWED_EMAIL_DOMAINS ?
   .filter(Boolean);
 
 export const currentUser = {
-  id: 'demo-user',
+  id: 'fixture-user',
   full_name: 'Pratham Bokefode',
   username: 'pratham',
   email: 'pratham@pccoepune.org',
@@ -13,7 +13,7 @@ export const currentUser = {
   branch: 'Computer Engineering',
   division: 'A',
   bio: 'Building the campus operating layer for PCCOE.',
-  role: 'admin',
+  role: 'student',
   skills: ['React', 'Supabase', 'Security', 'Product'],
   interests: ['GDGC', 'ACM', 'Startups'],
   is_onboarded: true,

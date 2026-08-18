@@ -5,16 +5,20 @@ import { ChatWindow } from '@/components/features/connect/ChatWindow.jsx';
 import { ConversationList } from '@/components/features/connect/ConversationList.jsx';
 import { useConversations, useMessages } from '@/hooks/useCampusData.js';
 import { useRealtimeInvalidation } from '@/hooks/useRealtimeInvalidation.js';
+import { sendMessage } from '@/lib/api.js';
+import { useAuthStore } from '@/stores/authStore.js';
 import { useNotificationStore } from '@/stores/notificationStore.js';
 
 export default function ConnectPage() {
   const { chatId } = useParams();
   const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
   const queryClient = useQueryClient();
   const addToast = useNotificationStore((state) => state.addToast);
   const { data: conversations = [] } = useConversations();
   const [activeId, setActiveId] = useState(chatId ?? conversations[0]?.id ?? 'c1');
   const { data: chatMessages = [] } = useMessages(activeId);
+  const renderedMessages = useMemo(() => chatMessages.map((message) => ({ ...message, mine: message.sender_id === user?.id })), [chatMessages, user?.id]);
   const active = conversations.find((item) => item.id === activeId) ?? conversations[0];
   const messageKeys = useMemo(() => [['messages', activeId], ['conversations']], [activeId]);
   useRealtimeInvalidation('messages', messageKeys, activeId ? `conversation_id=eq.${activeId}` : undefined);
@@ -32,10 +36,19 @@ export default function ConnectPage() {
     navigate(`/dashboard/connect/${id}`);
   }
 
-  function sendDemoMessage(body) {
-    const message = { id: crypto.randomUUID(), mine: true, body, time: 'now' };
-    queryClient.setQueryData(['messages', activeId], (existing = []) => [...existing, message]);
-    addToast('Message added locally. Live encrypted send needs recipient keys connected.', 'info');
+  async function sendConversationMessage(body) {
+    if (!activeId) return;
+    const pendingId = crypto.randomUUID();
+    const pending = { id: pendingId, mine: true, content: body, created_at: 'sending...' };
+    queryClient.setQueryData(['messages', activeId], (existing = []) => [...existing, pending]);
+    try {
+      await sendMessage({ conversationId: activeId, content: body });
+      queryClient.invalidateQueries({ queryKey: ['messages', activeId] });
+      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+    } catch (error) {
+      queryClient.setQueryData(['messages', activeId], (existing = []) => existing.filter((message) => message.id !== pendingId));
+      addToast(error.message, 'error');
+    }
   }
 
   return (
@@ -48,7 +61,7 @@ export default function ConnectPage() {
       </div>
       <div className="connect-layout glass-card">
         <ConversationList conversations={conversations} activeId={activeId} onSelect={selectConversation} />
-        <ChatWindow messages={chatMessages} title={active?.name} onSend={sendDemoMessage} />
+        <ChatWindow messages={renderedMessages} title={active?.name} onSend={sendConversationMessage} />
       </div>
     </section>
   );

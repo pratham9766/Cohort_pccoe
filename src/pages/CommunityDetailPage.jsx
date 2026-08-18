@@ -5,7 +5,7 @@ import { PostComposer } from '@/components/features/feed/PostComposer.jsx';
 import { Badge } from '@/components/ui/Badge.jsx';
 import { Button } from '@/components/ui/Button.jsx';
 import { Card } from '@/components/ui/Card.jsx';
-import { communities, posts } from '@/lib/constants.js';
+import { useCommunities, useFeed } from '@/hooks/useCampusData.js';
 import { toggleCommunitySubscription } from '@/lib/api.js';
 import { useNotificationStore } from '@/stores/notificationStore.js';
 
@@ -13,8 +13,10 @@ export default function CommunityDetailPage() {
   const { communityId } = useParams();
   const queryClient = useQueryClient();
   const addToast = useNotificationStore((state) => state.addToast);
-  const community = communities.find((item) => item.slug === communityId || item.id === communityId) ?? communities[0];
-  const communityPosts = posts.filter((post) => post.community?.id === community.id || post.community?.slug === community.slug);
+  const { data: communities = [], isLoading, error } = useCommunities();
+  const { data: posts = [] } = useFeed();
+  const community = communities.find((item) => item.slug === communityId || item.id === communityId);
+  const communityPosts = community ? posts.filter((post) => post.community_id === community.id || post.community?.id === community.id || post.community?.slug === community.slug) : [];
 
   async function toggleSubscription() {
     try {
@@ -24,6 +26,22 @@ export default function CommunityDetailPage() {
     } catch (error) {
       addToast(error.message, 'error');
     }
+  }
+
+  if (isLoading) {
+    return (
+      <section className="page stack">
+        <Card><p className="muted">Loading community...</p></Card>
+      </section>
+    );
+  }
+
+  if (error || !community) {
+    return (
+      <section className="page stack">
+        <Card><p className="muted">{error?.message ?? 'Community not found.'}</p></Card>
+      </section>
+    );
   }
 
   return (

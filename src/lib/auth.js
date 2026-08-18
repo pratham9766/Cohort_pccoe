@@ -1,5 +1,5 @@
 import { allowedEmailDomains } from './constants.js';
-import { supabase } from './supabase.js';
+import { requireSupabase, supabase } from './supabase.js';
 
 export function isAllowedPccoeEmail(email = '') {
   const normalized = email.toLowerCase();
@@ -20,16 +20,17 @@ export async function signInWithGoogle() {
 }
 
 export async function ensureUserProfile(authUser, publicKey) {
+  const db = requireSupabase();
   const profile = {
     id: authUser.id,
     email: authUser.email,
     full_name: authUser.user_metadata?.full_name ?? authUser.email?.split('@')[0] ?? 'PCCOE Student',
     avatar_url: authUser.user_metadata?.avatar_url,
-    public_key: publicKey,
     is_verified: true,
   };
+  if (publicKey) profile.public_key = publicKey;
 
-  return supabase
+  return db
     .from('users')
     .upsert(profile, { onConflict: 'id' })
     .select('*')

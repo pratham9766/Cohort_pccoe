@@ -169,6 +169,14 @@
   outline: 0;
 }
 
+.textarea-input {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  background: rgba(255, 255, 255, 0.045);
+  padding: var(--space-3);
+  resize: vertical;
+}
+
 .input::placeholder {
   color: var(--text-muted);
 }

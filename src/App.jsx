@@ -6,6 +6,8 @@ import { useAuth } from '@/hooks/useAuth.js';
 import { useUiStore } from '@/stores/uiStore.js';
 
 const LoginPage = lazy(() => import('@/pages/LoginPage.jsx'));
+const LandingPage = lazy(() => import('@/pages/LandingPage.jsx'));
+const DemoLoginPage = lazy(() => import('@/pages/DemoLoginPage.jsx'));
 const AuthCallbackPage = lazy(() => import('@/pages/AuthCallbackPage.jsx'));
 const OnboardingPage = lazy(() => import('@/pages/OnboardingPage.jsx'));
 const DashboardPage = lazy(() => import('@/pages/DashboardPage.jsx'));
@@ -64,8 +66,10 @@ export default function App() {
     <BrowserRouter>
       <Suspense fallback={<Splash />}>
         <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/demo" element={<DemoLoginPage />} />
+          <Route path="/demo-login" element={<DemoLoginPage />} />
           <Route path="/auth/callback" element={<AuthCallbackPage />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
           <Route path="/" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>

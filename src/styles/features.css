@@ -125,6 +125,40 @@
   gap: var(--space-2);
 }
 
+.comments-panel {
+  border-top: 1px solid var(--border-default);
+  padding-top: var(--space-3);
+}
+
+.comment-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.comment-row p {
+  margin-top: 0.125rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.comment-form {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.comment-form input {
+  min-width: 0;
+  flex: 1;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  background: rgba(255, 255, 255, 0.045);
+  color: var(--text-primary);
+  padding: var(--space-3);
+  outline: 0;
+}
+
 .composer form {
   display: grid;
   gap: var(--space-3);

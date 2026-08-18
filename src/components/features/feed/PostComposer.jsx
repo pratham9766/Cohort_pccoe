@@ -4,10 +4,11 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/Button.jsx';
 import { Card } from '@/components/ui/Card.jsx';
 import { createPost } from '@/lib/api.js';
-import { currentUser } from '@/lib/constants.js';
+import { useAuthStore } from '@/stores/authStore.js';
 import { useNotificationStore } from '@/stores/notificationStore.js';
 
 export function PostComposer({ community }) {
+  const user = useAuthStore((state) => state.user);
   const [value, setValue] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const queryClient = useQueryClient();
@@ -21,7 +22,7 @@ export function PostComposer({ community }) {
       const created = await createPost({ content: value.trim(), communityId: community?.id });
       const optimisticPost = {
         ...created,
-        author: currentUser,
+        author: user,
         community,
         content: value.trim(),
         like_count: 0,
@@ -29,6 +30,7 @@ export function PostComposer({ community }) {
         created_at: 'now',
       };
       queryClient.setQueryData(['feed'], (existing = []) => [optimisticPost, ...existing]);
+      queryClient.invalidateQueries({ queryKey: ['feed'] });
       if (community?.id) queryClient.invalidateQueries({ queryKey: ['communities'] });
       addToast('Post published.', 'success');
       setValue('');

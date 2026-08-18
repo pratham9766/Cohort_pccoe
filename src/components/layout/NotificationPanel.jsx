@@ -12,11 +12,6 @@ export function NotificationPanel() {
 
   if (!open) return null;
 
-  const fallback = [
-    { id: 'n1', message: 'GDGC PCCOE posted a new announcement', created_at: 'Today', is_read: false },
-    { id: 'n2', message: 'Isha commented on your GDGC post', created_at: 'Yesterday', is_read: true },
-  ];
-
   return (
     <aside className="notification-panel glass-elevated">
       <header>
@@ -29,12 +24,13 @@ export function NotificationPanel() {
         </div>
       </header>
       <div className="stack">
-        {(notifications.length ? notifications : fallback).map((item) => (
+        {notifications.map((item) => (
           <Card key={item.id} className={item.is_read ? '' : 'notification-unread'}>
             <strong>{item.message}</strong>
             <p className="muted">{item.created_at}</p>
           </Card>
         ))}
+        {!notifications.length ? <Card><p className="muted">No notifications yet.</p></Card> : null}
       </div>
     </aside>
   );

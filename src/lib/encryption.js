@@ -2,15 +2,18 @@ import nacl from 'tweetnacl';
 import { decodeBase64, decodeUTF8, encodeBase64, encodeUTF8 } from 'tweetnacl-util';
 
 const PRIVATE_KEY_STORAGE = 'cohort_private_key';
+const PUBLIC_KEY_STORAGE = 'cohort_public_key';
 
 export function ensureKeyPair() {
   const existingPrivateKey = localStorage.getItem(PRIVATE_KEY_STORAGE);
-  if (existingPrivateKey) return { privateKey: existingPrivateKey, publicKey: null };
+  const existingPublicKey = localStorage.getItem(PUBLIC_KEY_STORAGE);
+  if (existingPrivateKey && existingPublicKey) return { privateKey: existingPrivateKey, publicKey: existingPublicKey };
 
   const keyPair = nacl.box.keyPair();
   const privateKey = encodeBase64(keyPair.secretKey);
   const publicKey = encodeBase64(keyPair.publicKey);
   localStorage.setItem(PRIVATE_KEY_STORAGE, privateKey);
+  localStorage.setItem(PUBLIC_KEY_STORAGE, publicKey);
   return { privateKey, publicKey };
 }
 

@@ -6,11 +6,11 @@ A React + Supabase campus social platform foundation for PCCOE. The app is built
 
 - Protected React Router app shell with dashboard, communities, connect, XD board, map, calendar, profile, settings, and onboarding routes.
 - Supabase-ready authentication flow with Google OAuth and PCCOE email-domain restriction.
-- Demo mode fallback when Supabase environment variables are not configured.
+- Supabase-backed authentication flow with clear configuration errors when required environment variables are missing.
 - Reusable UI system with dark glass styling, responsive sidebar/top/mobile navigation, cards, buttons, badges, inputs, modals, tabs, skeletons, and toasts.
-- Connected frontend foundations for feed posts, community subscription, XD posting/voting, chat draft flow, notifications, and realtime query invalidation.
+- Connected frontend foundations for feed posts, community subscription, XD posting/voting, realtime message sending, notifications, and realtime query invalidation.
 - Supabase migrations for database tables, RLS policies, indexes, triggers, storage buckets, search RPCs, seed data, and realtime publication setup.
-- NaCl encryption utilities prepared for end-to-end encrypted messaging.
+- NaCl encryption utilities are present, but messaging should not be described as fully end-to-end encrypted until ciphertext-only delivery and protected key exchange are enabled.
 
 ## Tech Stack
 
@@ -61,9 +61,18 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 VITE_TOMTOM_API_KEY=your_tomtom_api_key
 VITE_ALLOWED_EMAIL_DOMAINS=pccoe.org,pccoepune.org
 VITE_APP_URL=http://localhost:5173
+
+# Server-only values for migrations/admin tooling. Never expose these with VITE_.
+POSTGRES_HOST=db.xxxxx.supabase.co
+POSTGRES_PORT=5432
+POSTGRES_DATABASE=postgres
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=your_postgres_password
+DATABASE_URL=postgresql://postgres:your_postgres_password@db.xxxxx.supabase.co:5432/postgres
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 ```
 
-Without Supabase values, the app runs in demo mode using local seed data.
+Without Supabase values, the app fails clearly at auth/data boundaries instead of using production demo fallbacks.
 
 ### Development
 
@@ -95,6 +104,7 @@ Apply the SQL migrations in order:
 
 1. `supabase/migrations/202608180001_initial_schema.sql`
 2. `supabase/migrations/202608180002_storage_search_realtime.sql`
+3. `supabase/migrations/202608180003_security_foundations.sql`
 
 These migrations create:
 
@@ -104,6 +114,7 @@ These migrations create:
 - Counter/update triggers.
 - Storage buckets and storage policies.
 - Realtime publication entries.
+- Institutional email enforcement, safer role handling, report/audit/achievement tables, stricter XD privacy, and safer conversation membership policies.
 
 After applying migrations:
 
@@ -138,14 +149,14 @@ Completed foundations include:
 - App flow and routing
 - Core UI shell
 - Backend schema
-- Demo data and live Supabase query fallbacks
-- Key action wiring for posts, communities, XD, chat draft, and notifications
+- Live Supabase query boundaries without silent demo fallbacks
+- Key action wiring for posts, communities, XD, realtime message sending, and notifications
 - Lint/build verification
 
 Still left for full production readiness:
 
 - Complete encrypted live message sending with recipient keys.
-- Full onboarding persistence and avatar upload.
+- Avatar upload and broader storage UX.
 - Live TomTom map integration.
 - Calendar month/week grid and admin event creation UI.
 - Feed comments/reactions/share flows.

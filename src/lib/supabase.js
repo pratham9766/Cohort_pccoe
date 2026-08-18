@@ -5,6 +5,10 @@ const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const hasSupabaseConfig = Boolean(url && anonKey && !url.includes('xxxxx') && !anonKey.includes('your_'));
 
+export const supabaseConfigError = hasSupabaseConfig
+  ? null
+  : 'Supabase is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.';
+
 export const supabase = hasSupabaseConfig
   ? createClient(url, anonKey, {
       auth: {
@@ -15,9 +19,14 @@ export const supabase = hasSupabaseConfig
     })
   : null;
 
-export async function safeSupabaseQuery(queryFactory, fallback) {
-  if (!supabase) return fallback;
-  const { data, error } = await queryFactory(supabase);
+export function requireSupabase() {
+  if (!supabase) throw new Error(supabaseConfigError);
+  return supabase;
+}
+
+export async function safeSupabaseQuery(queryFactory) {
+  const db = requireSupabase();
+  const { data, error } = await queryFactory(db);
   if (error) throw error;
-  return data ?? fallback;
+  return data ?? [];
 }

@@ -29,6 +29,19 @@ const xdTags = [
   { label: 'Facts', icon: Lightbulb },
 ];
 
+const categoryInterestMap = {
+  Memes: ['Memes'],
+  Tips: ['Education', 'Code', 'Tech', 'Facts'],
+  Ideas: ['Startups', 'Campus', 'Art', 'Tech'],
+  Rants: ['Campus', 'Psych', 'Education'],
+  Opportunities: ['Startups', 'Business', 'News'],
+  General: ['Campus'],
+};
+
+function getPostTags(post) {
+  return post.tags?.length ? post.tags : categoryInterestMap[post.category] ?? ['Campus'];
+}
+
 export default function XDPage() {
   const queryClient = useQueryClient();
   const { data = [] } = useXDPosts();
@@ -41,11 +54,18 @@ export default function XDPage() {
   const xdKeys = useMemo(() => [['xd-posts']], []);
   useRealtimeInvalidation('xd_posts', xdKeys);
 
+  const curatedPosts = useMemo(() => {
+    if (!selectedTags.length) return data;
+    const selected = new Set(selectedTags);
+    const matches = data.filter((post) => getPostTags(post).some((tag) => selected.has(tag)));
+    return matches.length ? matches : data;
+  }, [data, selectedTags]);
+
   const sortedPosts = useMemo(() => {
-    const copy = [...data];
+    const copy = [...curatedPosts];
     if (sort === 'New') return copy.sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
     return copy.sort((a, b) => (b.vote_count ?? 0) - (a.vote_count ?? 0));
-  }, [data, sort]);
+  }, [curatedPosts, sort]);
 
   async function submitPost() {
     if (!content.trim()) return;
@@ -105,6 +125,15 @@ export default function XDPage() {
           <h1 className="page-title">c/xd</h1>
           <p className="muted">Anonymous exchange curated for {selectedTags.slice(0, 3).join(', ')}.</p>
         </div>
+        <Button variant="ghost" onClick={() => setPickerComplete(false)}>Change interests</Button>
+      </div>
+      <div className="xd-interest-strip">
+        {xdTags.map((tag) => (
+          <button key={tag.label} type="button" className={selectedTags.includes(tag.label) ? 'selected' : ''} onClick={() => toggleTag(tag.label)}>
+            <tag.icon size={16} aria-hidden="true" />
+            <span>{tag.label}</span>
+          </button>
+        ))}
       </div>
       <Card className="composer">
         <textarea value={content} placeholder="What's on your mind? Post anonymously..." onChange={(event) => setContent(event.target.value)} />
@@ -118,7 +147,9 @@ export default function XDPage() {
       <div className="cluster">
         {['Hot', 'New', 'Top'].map((item) => <Button key={item} variant={sort === item ? 'primary' : 'ghost'} onClick={() => setSort(item)}>{item}</Button>)}
       </div>
-      {sortedPosts.map((post) => <XDPostCard key={post.id} post={post} onVote={() => vote(post)} onReport={() => addToast('Report queued for moderation.', 'info')} />)}
+      <div className="xd-feed">
+        {sortedPosts.map((post) => <XDPostCard key={post.id} post={post} tags={getPostTags(post)} onVote={() => vote(post)} onReport={() => addToast('Report queued for moderation.', 'info')} />)}
+      </div>
     </section>
   );
 }

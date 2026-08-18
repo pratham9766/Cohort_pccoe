@@ -93,6 +93,7 @@ html[data-theme='light'] .app-shell {
 }
 
 .brand-mark {
+  flex: 0 0 auto;
   display: grid;
   width: 36px;
   height: 36px;
@@ -107,6 +108,11 @@ html[data-theme='light'] .app-shell {
   width: 28px;
   height: 28px;
   object-fit: contain;
+}
+
+.sidebar svg {
+  flex: 0 0 auto;
+  stroke-width: 2.25;
 }
 
 .brand small,
@@ -136,6 +142,11 @@ html[data-theme='light'] .app-shell {
 
 .search-chip {
   color: var(--text-secondary);
+}
+
+.search-chip > svg,
+.nav-link > svg {
+  color: currentColor;
 }
 
 .sidebar:hover .search-chip,
@@ -198,7 +209,7 @@ html[data-theme='light'] .app-shell {
 .nav-link.active,
 .nav-link:hover {
   background: #43c6b7;
-  color: var(--text-primary);
+  color: #fff;
 }
 
 .nav-link.active::before {
@@ -243,6 +254,9 @@ html[data-theme='light'] .app-shell {
 .user-chip span,
 .nav-link span,
 .sidebar-footer .btn:not(.btn-icon) {
+  width: 0;
+  max-width: 0;
+  overflow: hidden;
   opacity: 0;
   pointer-events: none;
   transform: translateX(-0.45rem);
@@ -264,6 +278,9 @@ html[data-theme='light'] .app-shell {
 .sidebar:focus-within .nav-link span,
 .sidebar:hover .sidebar-footer .btn:not(.btn-icon),
 .sidebar:focus-within .sidebar-footer .btn:not(.btn-icon) {
+  width: auto;
+  max-width: 12rem;
+  overflow: visible;
   opacity: 1;
   pointer-events: auto;
   transform: translateX(0);

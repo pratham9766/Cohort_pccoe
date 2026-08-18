@@ -5,6 +5,7 @@ import { EventCard } from '@/components/features/calendar/EventCard.jsx';
 import { CommunityCard } from '@/components/features/communities/CommunityCard.jsx';
 import { PostCard } from '@/components/features/feed/PostCard.jsx';
 import { PostComposer } from '@/components/features/feed/PostComposer.jsx';
+import { ProgressTile } from '@/components/features/progress/ProgressTile.jsx';
 import { Card } from '@/components/ui/Card.jsx';
 import { useCalendarEvents, useCommunities, useFeed } from '@/hooks/useCampusData.js';
 import { useRealtimeInvalidation } from '@/hooks/useRealtimeInvalidation.js';
@@ -56,6 +57,7 @@ export default function DashboardPage() {
           {feed.map((post) => <PostCard key={post.id} post={post} />)}
         </div>
         <aside className="stack">
+          <ProgressTile />
           <Card className="stack">
             <h2><CalendarDays size={20} aria-hidden="true" /> Upcoming Events</h2>
             {events.slice(0, 2).map((event) => <EventCard key={event.id} event={event} />)}

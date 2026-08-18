@@ -415,3 +415,75 @@
     grid-template-columns: 1fr;
   }
 }
+
+.progress-tile {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.progress-tile header,
+.progress-tile footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.progress-tile h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-h2);
+}
+
+.progress-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(7, 11px);
+  grid-auto-columns: 11px;
+  gap: 4px;
+  overflow-x: auto;
+  padding-bottom: var(--space-1);
+}
+
+.progress-cell {
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.035);
+}
+
+.progress-cell.level-1 {
+  background: rgba(45, 178, 163, 0.28);
+}
+
+.progress-cell.level-2 {
+  background: rgba(45, 178, 163, 0.48);
+}
+
+.progress-cell.level-3 {
+  background: rgba(45, 178, 163, 0.72);
+}
+
+.progress-cell.level-4 {
+  background: #2dd4bf;
+}
+
+.progress-tile footer {
+  flex-wrap: wrap;
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+}
+
+.progress-tile footer span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.progress-tile footer strong {
+  color: var(--text-primary);
+}
+
+html[data-theme='light'] .progress-cell {
+  background: rgba(15, 23, 42, 0.08);
+}

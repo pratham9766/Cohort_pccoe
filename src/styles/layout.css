@@ -56,9 +56,10 @@ html[data-theme='light'] .app-shell {
   height: 100vh;
   align-items: center;
   flex-direction: column;
-  gap: var(--space-3);
-  overflow: hidden;
-  padding: var(--space-4) 0;
+  gap: var(--space-2);
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: var(--space-3) 0;
   transition:
     width var(--duration-normal) var(--ease-out),
     box-shadow var(--duration-normal) var(--ease-out),
@@ -74,11 +75,15 @@ html[data-theme='light'] .app-shell {
   box-shadow: 22px 0 60px rgba(0, 0, 0, 0.42);
 }
 
+.sidebar::-webkit-scrollbar {
+  width: 0;
+}
+
 .brand {
   display: flex;
   align-items: center;
   width: 48px;
-  min-height: 48px;
+  min-height: 42px;
   justify-content: center;
   gap: var(--space-3);
   font-family: var(--font-display);
@@ -126,7 +131,7 @@ html[data-theme='light'] .app-shell {
 .search-chip {
   display: flex;
   width: 48px;
-  min-height: 48px;
+  min-height: 44px;
   align-items: center;
   justify-content: center;
   gap: var(--space-3);
@@ -170,7 +175,7 @@ html[data-theme='light'] .app-shell {
 .sidebar-nav {
   display: grid;
   width: 48px;
-  gap: var(--space-1);
+  gap: 0.2rem;
   transition: width var(--duration-normal) var(--ease-out);
 }
 
@@ -183,7 +188,7 @@ html[data-theme='light'] .app-shell {
   position: relative;
   display: flex;
   width: 48px;
-  min-height: 48px;
+  min-height: 42px;
   align-items: center;
   justify-content: center;
   gap: var(--space-3);
@@ -238,7 +243,7 @@ html[data-theme='light'] .app-shell {
 .sidebar-footer {
   display: grid;
   width: 48px;
-  gap: var(--space-2);
+  gap: 0.25rem;
   margin-top: auto;
   transition: width var(--duration-normal) var(--ease-out);
 }
@@ -466,6 +471,7 @@ html[data-theme='light'] .search-chip {
 
 .sidebar-footer .btn:not(.btn-icon) {
   width: 100%;
+  min-height: 42px;
   justify-content: flex-start;
   overflow: hidden;
 }
@@ -622,6 +628,34 @@ html[data-theme='light'] .search-chip {
 
   .right-rail {
     display: none;
+  }
+}
+
+@media (max-height: 940px) and (min-width: 861px) {
+  .sidebar {
+    gap: 0.35rem;
+    padding-top: var(--space-2);
+    padding-bottom: var(--space-2);
+  }
+
+  .sidebar-sticker,
+  .sidebar-footer .user-chip {
+    display: none;
+  }
+
+  .brand,
+  .nav-link,
+  .sidebar-footer .btn:not(.btn-icon) {
+    min-height: 38px;
+  }
+
+  .search-chip {
+    min-height: 40px;
+  }
+
+  .sidebar-nav,
+  .sidebar-footer {
+    gap: 0.1rem;
   }
 }
 

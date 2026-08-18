@@ -20,14 +20,10 @@ export default function DashboardPage() {
 
   return (
     <section className="page">
-      <div className="page-header dashboard-hero">
+      <div className="page-header">
         <div>
-          <p className="eyebrow">Discover. Connect. Collaborate.</p>
-          <h1 className="page-title">Cohort PCCOE</h1>
-          <p className="muted">Your student-led campus hub for communities, conversations, events, and opportunities.</p>
-        </div>
-        <div className="hero-logo" aria-hidden="true">
-          <img src="/cohort-logo.png" alt="" />
+          <h1 className="page-title">c/home</h1>
+          <p className="muted">Discover, connect, and collaborate across PCCOE.</p>
         </div>
       </div>
 

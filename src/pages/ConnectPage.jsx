@@ -55,8 +55,8 @@ export default function ConnectPage() {
     <section className="page stack">
       <div className="page-header">
         <div>
-          <p className="eyebrow">Connect</p>
-          <h1 className="page-title">Encrypted messaging</h1>
+          <h1 className="page-title">c/connect</h1>
+          <p className="muted">Private chats for cohort users.</p>
         </div>
       </div>
       <div className="connect-layout glass-card">

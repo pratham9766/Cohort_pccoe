@@ -10,8 +10,8 @@ export default function MapPage() {
     <section className="page stack">
       <div className="page-header">
         <div>
-          <p className="eyebrow">Campus Map</p>
-          <h1 className="page-title">PCCOE locations</h1>
+          <h1 className="page-title">c/maps</h1>
+          <p className="muted">Interactive internal campus map for PCCOE.</p>
         </div>
       </div>
       <Input icon={Search} placeholder="Search labs, classrooms, canteen..." />

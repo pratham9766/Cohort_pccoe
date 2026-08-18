@@ -1,24 +1,23 @@
-import { Check, Users } from 'lucide-react';
-import { Badge } from '@/components/ui/Badge.jsx';
-import { Button } from '@/components/ui/Button.jsx';
+import { Bell, Users } from 'lucide-react';
 import { Card } from '@/components/ui/Card.jsx';
 
 export function CommunityCard({ community, onOpen, onToggle }) {
   return (
     <Card hover className="community-card">
+      <div className={`community-cover-card cover-${community.category}`} aria-hidden="true" />
+      <button type="button" className="community-bell" onClick={onToggle} aria-label={`${community.subscribed ? 'Unsubscribe from' : 'Subscribe to'} ${community.name}`}>
+        <Bell size={18} aria-hidden="true" />
+      </button>
       <button type="button" className="community-logo" onClick={onOpen} aria-label={`Open ${community.name}`}>
         {community.name.slice(0, 2).toUpperCase()}
       </button>
-      <div className="community-stats">
-        <Users size={16} aria-hidden="true" />
-        {community.member_count}
-      </div>
       <button type="button" className="community-title" onClick={onOpen}>{community.name}</button>
-      <Badge variant={community.category}>{community.category}</Badge>
-      <p className="muted">{community.description}</p>
-      <Button variant={community.subscribed ? 'secondary' : 'primary'} icon={community.subscribed ? Check : undefined} onClick={onToggle}>
-        {community.subscribed ? 'Unsubscribe' : 'Subscribe'}
-      </Button>
+      <p className="community-handle muted">@{community.slug ?? community.name.toLowerCase().replaceAll(' ', '')}</p>
+      <p className="muted community-description">{community.description}</p>
+      <div className="community-members muted">
+        <Users size={15} aria-hidden="true" />
+        {community.member_count} members
+      </div>
     </Card>
   );
 }

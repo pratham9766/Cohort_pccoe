@@ -3,6 +3,7 @@ import { useCallback } from 'react';
 import { BottomNav } from './BottomNav.jsx';
 import { NotificationPanel } from './NotificationPanel.jsx';
 import { SearchModal } from './SearchModal.jsx';
+import { RightRail } from './RightRail.jsx';
 import { Sidebar } from './Sidebar.jsx';
 import { TopNav } from './TopNav.jsx';
 import { ToastViewport } from '@/components/ui/Toast.jsx';
@@ -41,6 +42,7 @@ export function AppShell() {
           <Outlet />
         </main>
       </div>
+      <RightRail />
       <BottomNav />
       <NotificationPanel />
       <SearchModal />

@@ -15,6 +15,8 @@ const CommunitiesPage = lazy(() => import('@/pages/CommunitiesPage.jsx'));
 const CommunityDetailPage = lazy(() => import('@/pages/CommunityDetailPage.jsx'));
 const ConnectPage = lazy(() => import('@/pages/ConnectPage.jsx'));
 const XDPage = lazy(() => import('@/pages/XDPage.jsx'));
+const ArcadePage = lazy(() => import('@/pages/ArcadePage.jsx'));
+const HeadsUpPage = lazy(() => import('@/pages/HeadsUpPage.jsx'));
 const MapPage = lazy(() => import('@/pages/MapPage.jsx'));
 const CalendarPage = lazy(() => import('@/pages/CalendarPage.jsx'));
 const ProfilePage = lazy(() => import('@/pages/ProfilePage.jsx'));
@@ -41,6 +43,12 @@ function ProtectedRoute({ children }) {
 
 export default function App() {
   const setSearchOpen = useUiStore((state) => state.setSearchOpen);
+  const theme = useUiStore((state) => state.theme);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+  }, [theme]);
 
   useEffect(() => {
     const preventDefaultTools = (event) => {
@@ -80,6 +88,8 @@ export default function App() {
             <Route path="dashboard/connect/:chatId" element={<ConnectPage />} />
             <Route path="dashboard/xd" element={<XDPage />} />
             <Route path="dashboard/xd/:postId" element={<XDPage />} />
+            <Route path="dashboard/arcade" element={<ArcadePage />} />
+            <Route path="dashboard/headsup" element={<HeadsUpPage />} />
             <Route path="dashboard/map" element={<MapPage />} />
             <Route path="dashboard/calendar" element={<CalendarPage />} />
             <Route path="dashboard/profile" element={<ProfilePage />} />
@@ -91,6 +101,8 @@ export default function App() {
             <Route path="connect/:chatId" element={<ConnectPage />} />
             <Route path="xd" element={<XDPage />} />
             <Route path="xd/:postId" element={<XDPage />} />
+            <Route path="arcade" element={<ArcadePage />} />
+            <Route path="headsup" element={<HeadsUpPage />} />
             <Route path="map" element={<MapPage />} />
             <Route path="calendar" element={<CalendarPage />} />
             <Route path="profile" element={<ProfilePage />} />

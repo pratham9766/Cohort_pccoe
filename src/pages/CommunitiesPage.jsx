@@ -1,10 +1,9 @@
-import { Search } from 'lucide-react';
+import { Bell, SlidersHorizontal } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { CommunityCard } from '@/components/features/communities/CommunityCard.jsx';
 import { Button } from '@/components/ui/Button.jsx';
-import { Input } from '@/components/ui/Input.jsx';
 import { useCommunities } from '@/hooks/useCampusData.js';
 import { toggleCommunitySubscription } from '@/lib/api.js';
 import { useNotificationStore } from '@/stores/notificationStore.js';
@@ -48,15 +47,23 @@ export default function CommunitiesPage() {
     <section className="page stack">
       <div className="page-header">
         <div>
-          <p className="eyebrow">Communities</p>
-          <h1 className="page-title">Find your campus circle</h1>
+          <h1 className="page-title">c/communities</h1>
+          <p className="muted">Join discussions and connect with your peers.</p>
         </div>
+        <label className="department-filter">
+          <SlidersHorizontal size={17} aria-hidden="true" />
+          <span>Department:</span>
+          <select value={category} onChange={(event) => setCategory(event.target.value)}>
+            {categories.map((item) => <option key={item} value={item}>{item === 'All' ? 'All Departments' : item}</option>)}
+          </select>
+        </label>
       </div>
-      <Input icon={Search} placeholder="Search clubs and organizations" value={query} onChange={(event) => setQuery(event.target.value)} />
-      <div className="cluster">
-        {categories.map((item) => <Button key={item} variant={category === item ? 'primary' : 'ghost'} onClick={() => setCategory(item)}>{item}</Button>)}
+      <div className="community-section-head">
+        <h2>Student Development and Welfare (SDW)</h2>
+        <Button variant="ghost" icon={Bell}>Subscribe All</Button>
       </div>
-      <div className="grid three">
+      <input className="sr-only" value={query} onChange={(event) => setQuery(event.target.value)} aria-label="Search communities" />
+      <div className="community-grid-original">
         {filtered.map((community) => (
           <CommunityCard
             key={community.id}

@@ -4,9 +4,11 @@ A React + Supabase campus social platform foundation for PCCOE. The app is built
 
 ## Features
 
+- Public landing page matching the Cohort PCCOE product direction.
+- Explicit demo login at `/demo` and `/demo-login` with local fixture data.
 - Protected React Router app shell with dashboard, communities, connect, XD board, map, calendar, profile, settings, and onboarding routes.
 - Supabase-ready authentication flow with Google OAuth and PCCOE email-domain restriction.
-- Supabase-backed authentication flow with clear configuration errors when required environment variables are missing.
+- Supabase-backed authentication and data paths with clear configuration errors when required environment variables are missing.
 - Reusable UI system with dark glass styling, responsive sidebar/top/mobile navigation, cards, buttons, badges, inputs, modals, tabs, skeletons, and toasts.
 - Connected frontend foundations for feed posts, community subscription, XD posting/voting, realtime message sending, notifications, and realtime query invalidation.
 - Supabase migrations for database tables, RLS policies, indexes, triggers, storage buckets, search RPCs, seed data, and realtime publication setup.
@@ -74,6 +76,16 @@ SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 
 Without Supabase values, the app fails clearly at auth/data boundaries instead of using production demo fallbacks.
 
+### Demo Mode
+
+Demo mode is explicit and local-only:
+
+```text
+http://localhost:5173/demo
+```
+
+It signs in as a fixture user and unlocks local fixture data. Normal production routes do not silently fall back to demo data.
+
 ### Development
 
 ```bash
@@ -105,6 +117,8 @@ Apply the SQL migrations in order:
 1. `supabase/migrations/202608180001_initial_schema.sql`
 2. `supabase/migrations/202608180002_storage_search_realtime.sql`
 3. `supabase/migrations/202608180003_security_foundations.sql`
+4. `supabase/migrations/202608180004_permissions_security_hardening.sql`
+5. `supabase/migrations/202608180005_conversation_rls_recursion_fix.sql`
 
 These migrations create:
 
@@ -115,6 +129,7 @@ These migrations create:
 - Storage buckets and storage policies.
 - Realtime publication entries.
 - Institutional email enforcement, safer role handling, report/audit/achievement tables, stricter XD privacy, and safer conversation membership policies.
+- Explicit authenticated grants, community/admin management policies, moderation policies, storage update/delete policies, and recursion-safe conversation RLS helper functions.
 
 After applying migrations:
 
@@ -122,6 +137,42 @@ After applying migrations:
 - Add `http://localhost:5173/auth/callback` to allowed redirect URLs.
 - Add your production callback URL before deployment.
 - Ensure the configured allowed domains match `VITE_ALLOWED_EMAIL_DOMAINS`.
+
+### Production Supabase Checklist
+
+1. Create a Supabase project and copy the project URL plus anon key into `.env`.
+2. In Supabase Auth, enable Google OAuth and configure Google Cloud OAuth credentials.
+3. Add redirect URLs:
+   - `http://localhost:5173/auth/callback`
+   - `https://your-production-domain/auth/callback`
+4. Apply migrations in filename order through the Supabase SQL editor or CLI.
+5. Confirm Realtime publication includes `posts`, `messages`, `notifications`, and `xd_posts`.
+6. Confirm storage buckets exist: `avatars`, `community-assets`, `post-media`, `message-files`, `xd-media`.
+7. Run the RLS/security regression suite against a non-production database before launch.
+
+### Local PostgreSQL
+
+For local PostgreSQL compatibility, the project includes a migration runner that creates lightweight `auth` and `storage` schema shims before applying Supabase migrations:
+
+```bash
+pnpm db:migrate:local
+```
+
+The runner reads `DATABASE_URL` from `.env`. Example:
+
+```env
+DATABASE_URL=postgresql://postgres:your_password@localhost:5432/cohort
+```
+
+### Security Tests
+
+Run database authorization tests:
+
+```bash
+pnpm test:security
+```
+
+These tests attempt malicious operations such as editing another profile, deleting another post, reading private messages, role escalation, XD author leakage, unauthorized uploads, unauthorized audit writes, and unauthorized official event creation.
 
 ## Project Structure
 

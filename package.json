@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0"
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "db:migrate:local": "node scripts/apply-local-postgres-migrations.cjs",
+    "test": "node scripts/run-rls-security-tests.cjs",
+    "test:security": "node scripts/run-rls-security-tests.cjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",

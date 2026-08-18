@@ -180,6 +180,36 @@ export async function sendMessage({ conversationId, content }) {
   return data;
 }
 
+export async function sendCampusChatMessage(content) {
+  if (isDemoSessionActive()) {
+    const demoUser = getDemoActiveUser();
+    return {
+      id: crypto.randomUUID(),
+      sender_id: demoUser.id,
+      content,
+      created_at: 'now',
+      sender: demoUser,
+    };
+  }
+  const supabase = requireSupabase();
+  const senderId = await getActiveUserId();
+  const { data, error } = await supabase
+    .from('campus_chat_messages')
+    .insert({ sender_id: senderId, content })
+    .select('id, sender_id, content, created_at, sender:users(id, full_name, avatar_url, branch)')
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteCampusChatMessage(messageId) {
+  if (isDemoSessionActive()) return { id: messageId };
+  const supabase = requireSupabase();
+  const { error } = await supabase.from('campus_chat_messages').delete().eq('id', messageId);
+  if (error) throw error;
+  return { id: messageId };
+}
+
 export async function createCalendarEvent(event) {
   if (isDemoSessionActive()) return { id: crypto.randomUUID(), ...event, created_by: getDemoActiveUser().id };
   const supabase = requireSupabase();

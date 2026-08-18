@@ -1,195 +1,377 @@
-import { CheckCircle2, Gamepad2, RotateCcw, Timer, Trophy, Zap } from 'lucide-react';
-import { useMemo, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { Chess } from 'chess.js';
+import { Crown, Grid3X3, Puzzle, RotateCcw } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/Button.jsx';
 import { Card } from '@/components/ui/Card.jsx';
-import { useArcadeLeaderboard } from '@/hooks/useCampusData.js';
-import { saveArcadeScore } from '@/lib/api.js';
-import { useNotificationStore } from '@/stores/notificationStore.js';
 
-const quizQuestions = [
-  {
-    question: 'Which club is best suited for product-building workshops?',
-    answers: ['GDGC PCCOE', 'Sports Council', 'Art Circle'],
-    correct: 'GDGC PCCOE',
-  },
-  {
-    question: 'Where should students look for campus deadlines?',
-    answers: ['c/calendar', 'c/maps', 'c/connect'],
-    correct: 'c/calendar',
-  },
-  {
-    question: 'Which feature is meant for anonymous campus exchange?',
-    answers: ['XD', 'HeadsUp', 'Profile'],
-    correct: 'XD',
-  },
+const games = [
+  { key: 'chess', title: 'Chess', description: 'You vs Buddy AI.', icon: Crown },
+  { key: 'tic-tac-toe', title: 'Tic-Tac-Toe', description: 'Play against Buddy AI.', icon: Grid3X3 },
+  { key: 'sudoku', title: 'Sudoku', description: 'Fill the 9x9 grid.', icon: Puzzle },
 ];
 
-const memorySeed = ['GDGC', 'NSS', 'ACM', 'E-Cell', 'GDGC', 'NSS', 'ACM', 'E-Cell'];
+const chessFiles = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+const chessPieces = {
+  wp: '♙',
+  wn: '♘',
+  wb: '♗',
+  wr: '♖',
+  wq: '♕',
+  wk: '♔',
+  bp: '♟',
+  bn: '♞',
+  bb: '♝',
+  br: '♜',
+  bq: '♛',
+  bk: '♚',
+};
+
+const sudokuPuzzle = [
+  [0, 0, 0, 7, 0, 0, 5, 0, 3],
+  [5, 2, 3, 9, 6, 0, 4, 0, 0],
+  [4, 0, 0, 0, 5, 0, 0, 9, 0],
+  [0, 0, 0, 1, 0, 0, 0, 0, 5],
+  [7, 0, 0, 0, 0, 6, 0, 0, 0],
+  [9, 0, 0, 0, 7, 0, 2, 3, 0],
+  [0, 0, 0, 4, 1, 0, 8, 0, 2],
+  [0, 0, 7, 0, 0, 0, 0, 6, 0],
+  [0, 0, 2, 6, 3, 0, 0, 4, 7],
+];
+
+const sudokuSolution = [
+  [6, 8, 9, 7, 4, 2, 5, 1, 3],
+  [5, 2, 3, 9, 6, 1, 4, 7, 8],
+  [4, 7, 1, 8, 5, 3, 6, 9, 2],
+  [2, 3, 6, 1, 8, 4, 7, 5, 9],
+  [7, 1, 5, 3, 9, 6, 2, 8, 4],
+  [9, 4, 8, 5, 7, 2, 1, 3, 6],
+  [3, 6, 4, 2, 1, 7, 8, 9, 5],
+  [1, 5, 7, 4, 2, 9, 3, 6, 8],
+  [8, 9, 2, 6, 3, 5, 1, 4, 7],
+];
+
+function createSudokuGrid() {
+  return sudokuPuzzle.map((row) => row.map((value) => (value ? String(value) : '')));
+}
+
+function chessStatus(chess, playerColor) {
+  const player = playerColor === 'w' ? 'White' : 'Black';
+  const buddy = playerColor === 'w' ? 'Black' : 'White';
+  if (chess.isCheckmate()) return chess.turn() === playerColor ? 'Buddy AI wins by checkmate.' : 'You win by checkmate.';
+  if (chess.isDraw()) return 'Draw.';
+  if (chess.isCheck()) return `${chess.turn() === playerColor ? player : buddy} is in check.`;
+  return chess.turn() === playerColor ? 'Your turn' : 'Buddy AI thinking...';
+}
+
+function pickChessMove(chess) {
+  const moves = chess.moves({ verbose: true });
+  const captures = moves.filter((move) => move.captured);
+  const checks = moves.filter((move) => move.san.includes('+') || move.san.includes('#'));
+  const candidates = checks.length ? checks : captures.length ? captures : moves;
+  return candidates[Math.floor(Math.random() * candidates.length)];
+}
+
+function getWinner(board) {
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  const win = lines.find(([a, b, c]) => board[a] && board[a] === board[b] && board[a] === board[c]);
+  if (win) return board[win[0]];
+  if (board.every(Boolean)) return 'draw';
+  return null;
+}
+
+function chooseTicTacToeMove(board, aiMark, playerMark) {
+  const empty = board.map((cell, index) => (cell ? null : index)).filter((index) => index !== null);
+  const winningMove = empty.find((index) => getWinner(board.map((cell, cellIndex) => (cellIndex === index ? aiMark : cell))) === aiMark);
+  if (winningMove !== undefined) return winningMove;
+  const blockingMove = empty.find(
+    (index) => getWinner(board.map((cell, cellIndex) => (cellIndex === index ? playerMark : cell))) === playerMark,
+  );
+  if (blockingMove !== undefined) return blockingMove;
+  if (empty.includes(4)) return 4;
+  const corners = empty.filter((index) => [0, 2, 6, 8].includes(index));
+  return (corners.length ? corners : empty)[0];
+}
+
+function sudokuComplete(grid) {
+  return grid.every((row, rowIndex) =>
+    row.every((value, columnIndex) => Number(value) === sudokuSolution[rowIndex][columnIndex]),
+  );
+}
 
 export default function ArcadePage() {
-  const queryClient = useQueryClient();
-  const { data: leaderboard = [] } = useArcadeLeaderboard();
-  const addToast = useNotificationStore((state) => state.addToast);
-  const [selectedAnswer, setSelectedAnswer] = useState('');
-  const [score, setScore] = useState(0);
-  const [questionIndex, setQuestionIndex] = useState(0);
-  const [flipped, setFlipped] = useState([]);
-  const [matched, setMatched] = useState([]);
-  const [streak, setStreak] = useState(0);
-  const [saving, setSaving] = useState(false);
-  const question = quizQuestions[questionIndex];
+  const [activeGame, setActiveGame] = useState('chess');
+  const [chessFen, setChessFen] = useState('start');
+  const [selectedSquare, setSelectedSquare] = useState('');
+  const [playerColor, setPlayerColor] = useState('w');
+  const [ticTacToeBoard, setTicTacToeBoard] = useState(Array(9).fill(''));
+  const [playerMark, setPlayerMark] = useState('X');
+  const [sudokuGrid, setSudokuGrid] = useState(() => createSudokuGrid());
+  const [selectedCell, setSelectedCell] = useState({ row: 0, column: 0 });
+  const [showMistakes, setShowMistakes] = useState(false);
 
-  const memoryCards = useMemo(
-    () => memorySeed.map((label, index) => ({ id: `${label}-${index}`, label })),
-    [],
-  );
+  const chess = useMemo(() => (chessFen === 'start' ? new Chess() : new Chess(chessFen)), [chessFen]);
+  const chessBoard = chess.board();
+  const legalTargets = selectedSquare
+    ? chess.moves({ square: selectedSquare, verbose: true }).map((move) => move.to)
+    : [];
+  const aiMark = playerMark === 'X' ? 'O' : 'X';
+  const ticTacToeWinner = getWinner(ticTacToeBoard);
 
-  const pickAnswer = (answer) => {
-    setSelectedAnswer(answer);
-    if (answer === question.correct) {
-      setScore((current) => current + 10);
-      setStreak((current) => current + 1);
-    } else {
-      setStreak(0);
-    }
-  };
-
-  const nextQuestion = () => {
-    setSelectedAnswer('');
-    setQuestionIndex((current) => (current + 1) % quizQuestions.length);
-  };
-
-  const flipCard = (card) => {
-    if (matched.includes(card.label) || flipped.some((item) => item.id === card.id) || flipped.length === 2) return;
-    const nextFlipped = [...flipped, card];
-    setFlipped(nextFlipped);
-    if (nextFlipped.length === 2) {
-      if (nextFlipped[0].label === nextFlipped[1].label) {
-        setMatched((current) => [...current, card.label]);
-        setScore((current) => current + 15);
-        setFlipped([]);
-      } else {
-        window.setTimeout(() => setFlipped([]), 700);
+  useEffect(() => {
+    if (activeGame !== 'chess' || chess.isGameOver() || chess.turn() === playerColor) return;
+    const timer = window.setTimeout(() => {
+      const nextChess = chessFen === 'start' ? new Chess() : new Chess(chessFen);
+      const move = pickChessMove(nextChess);
+      if (move) {
+        nextChess.move({ from: move.from, to: move.to, promotion: 'q' });
+        setChessFen(nextChess.fen());
       }
-    }
-  };
+    }, 450);
+    return () => window.clearTimeout(timer);
+  }, [activeGame, chess, chessFen, playerColor]);
 
-  const resetArcade = () => {
-    setSelectedAnswer('');
-    setScore(0);
-    setQuestionIndex(0);
-    setFlipped([]);
-    setMatched([]);
-    setStreak(0);
-  };
+  useEffect(() => {
+    if (activeGame !== 'tic-tac-toe' || ticTacToeWinner) return;
+    const xCount = ticTacToeBoard.filter((cell) => cell === 'X').length;
+    const oCount = ticTacToeBoard.filter((cell) => cell === 'O').length;
+    const currentTurn = xCount === oCount ? 'X' : 'O';
+    if (currentTurn === playerMark) return;
 
-  const saveScore = async () => {
-    if (!score) return;
-    setSaving(true);
-    try {
-      await saveArcadeScore({
-        score,
-        streak,
-        matches: matched.length,
-        metadata: { questionIndex, completedPairs: matched },
+    const timer = window.setTimeout(() => {
+      setTicTacToeBoard((board) => {
+        if (getWinner(board)) return board;
+        const index = chooseTicTacToeMove(board, aiMark, playerMark);
+        return board.map((cell, cellIndex) => (cellIndex === index ? aiMark : cell));
       });
-      queryClient.invalidateQueries({ queryKey: ['arcade-leaderboard'] });
-      addToast('Arcade score saved.', 'success');
-    } catch (error) {
-      addToast(error.message, 'error');
-    } finally {
-      setSaving(false);
+    }, 350);
+    return () => window.clearTimeout(timer);
+  }, [activeGame, aiMark, playerMark, ticTacToeBoard, ticTacToeWinner]);
+
+  const resetChess = (color = playerColor) => {
+    setPlayerColor(color);
+    setChessFen('start');
+    setSelectedSquare('');
+  };
+
+  const moveChessPiece = (square, piece) => {
+    if (chess.isGameOver() || chess.turn() !== playerColor) return;
+    if (!selectedSquare) {
+      if (piece?.color === playerColor) setSelectedSquare(square);
+      return;
     }
+    if (selectedSquare === square) {
+      setSelectedSquare('');
+      return;
+    }
+    const targetOwnPiece = piece?.color === playerColor;
+    const move = chess.move({ from: selectedSquare, to: square, promotion: 'q' });
+    if (move) {
+      setChessFen(chess.fen());
+      setSelectedSquare('');
+    } else {
+      setSelectedSquare(targetOwnPiece ? square : '');
+    }
+  };
+
+  const resetTicTacToe = (mark = playerMark) => {
+    setPlayerMark(mark);
+    setTicTacToeBoard(Array(9).fill(''));
+  };
+
+  const playTicTacToe = (index) => {
+    if (ticTacToeWinner || ticTacToeBoard[index]) return;
+    const xCount = ticTacToeBoard.filter((cell) => cell === 'X').length;
+    const oCount = ticTacToeBoard.filter((cell) => cell === 'O').length;
+    const currentTurn = xCount === oCount ? 'X' : 'O';
+    if (currentTurn !== playerMark) return;
+    setTicTacToeBoard((board) => board.map((cell, cellIndex) => (cellIndex === index ? playerMark : cell)));
+  };
+
+  const setSudokuValue = (value) => {
+    const { row, column } = selectedCell;
+    if (sudokuPuzzle[row][column]) return;
+    setSudokuGrid((grid) =>
+      grid.map((gridRow, rowIndex) =>
+        gridRow.map((cell, columnIndex) => (rowIndex === row && columnIndex === column ? value : cell)),
+      ),
+    );
+  };
+
+  const resetSudoku = () => {
+    setSudokuGrid(createSudokuGrid());
+    setSelectedCell({ row: 0, column: 0 });
+    setShowMistakes(false);
   };
 
   return (
-    <section className="page stack">
+    <section className="page stack arcade-page">
       <div className="page-header">
         <div>
           <h1 className="page-title">c/arcade</h1>
-          <p className="muted">Quick campus games for breaks between lectures.</p>
+          <p className="muted">Quick browser games you can play inside cohort.</p>
         </div>
-        <Button variant="ghost" icon={RotateCcw} onClick={resetArcade}>
-          Reset
-        </Button>
-        <Button icon={Trophy} disabled={!score || saving} onClick={saveScore}>
-          {saving ? 'Saving...' : 'Save Score'}
-        </Button>
       </div>
 
-      <div className="arcade-score-strip">
-        <Card>
-          <Trophy size={20} aria-hidden="true" />
-          <span>Score</span>
-          <strong>{score}</strong>
-        </Card>
-        <Card>
-          <Zap size={20} aria-hidden="true" />
-          <span>Streak</span>
-          <strong>{streak}</strong>
-        </Card>
-        <Card>
-          <Timer size={20} aria-hidden="true" />
-          <span>Matches</span>
-          <strong>{matched.length}/4</strong>
-        </Card>
+      <div className="arcade-game-picker" role="tablist" aria-label="Arcade games">
+        {games.map((game) => {
+          const Icon = game.icon;
+          const isActive = activeGame === game.key;
+          return (
+            <button
+              type="button"
+              key={game.key}
+              className={isActive ? 'active' : ''}
+              role="tab"
+              aria-selected={isActive}
+              onClick={() => setActiveGame(game.key)}
+            >
+              <span>
+                <Icon size={18} aria-hidden="true" />
+                <strong>{game.title}</strong>
+              </span>
+              <small>{game.description}</small>
+            </button>
+          );
+        })}
       </div>
 
-      <div className="arcade-layout">
-        <Card className="stack arcade-panel">
-          <h2>
-            <Gamepad2 size={20} aria-hidden="true" />
-            Campus Quiz
-          </h2>
-          <p>{question.question}</p>
-          <div className="arcade-answer-grid">
-            {question.answers.map((answer) => (
-              <button
-                type="button"
-                key={answer}
-                className={selectedAnswer === answer ? 'selected' : ''}
-                disabled={Boolean(selectedAnswer)}
-                onClick={() => pickAnswer(answer)}
-              >
-                {answer}
-              </button>
-            ))}
-          </div>
-          {selectedAnswer ? (
-            <div className="arcade-result">
-              <CheckCircle2 size={18} aria-hidden="true" />
-              <span>{selectedAnswer === question.correct ? 'Correct answer' : `Correct: ${question.correct}`}</span>
-              <Button variant="ghost" onClick={nextQuestion}>Next</Button>
+      <Button variant="ghost" className="arcade-more-button" disabled>
+        More games coming soon!
+      </Button>
+
+      <Card className="arcade-play-surface">
+        {activeGame === 'chess' ? (
+          <>
+            <div className="arcade-play-header">
+              <p>
+                You are <strong>{playerColor === 'w' ? 'White' : 'Black'}</strong>. Buddy AI is{' '}
+                <strong>{playerColor === 'w' ? 'Black' : 'White'}</strong>.
+              </p>
+              <div className="arcade-control-row">
+                <Button onClick={() => resetChess('w')}>Play White</Button>
+                <Button variant="ghost" onClick={() => resetChess('b')}>Play Black</Button>
+                <Button icon={RotateCcw} onClick={() => resetChess()}>Reset board</Button>
+              </div>
             </div>
-          ) : null}
-        </Card>
+            <p className="arcade-turn-label">{chessStatus(chess, playerColor)}</p>
+            <div className="chess-board playable-chess-board" aria-label="Chess board">
+              {chessBoard.map((row, rowIndex) =>
+                row.map((piece, columnIndex) => {
+                  const displayRow = playerColor === 'w' ? rowIndex : 7 - rowIndex;
+                  const displayColumn = playerColor === 'w' ? columnIndex : 7 - columnIndex;
+                  const displayPiece = chessBoard[displayRow][displayColumn];
+                  const square = `${chessFiles[displayColumn]}${8 - displayRow}`;
+                  const isDark = (displayRow + displayColumn) % 2 === 1;
+                  const isSelected = selectedSquare === square;
+                  const isLegalTarget = legalTargets.includes(square);
 
-        <Card className="stack arcade-panel">
-          <h2>Club Memory</h2>
-          <div className="memory-grid">
-            {memoryCards.map((card) => {
-              const isOpen = matched.includes(card.label) || flipped.some((item) => item.id === card.id);
-              return (
-                <button type="button" key={card.id} className={isOpen ? 'open' : ''} onClick={() => flipCard(card)}>
-                  {isOpen ? card.label : '?'}
+                  return (
+                    <button
+                      type="button"
+                      key={`${rowIndex}-${columnIndex}`}
+                      className={[
+                        'chess-square',
+                        isDark ? 'dark' : 'light',
+                        isSelected ? 'selected' : '',
+                        isLegalTarget ? 'target' : '',
+                      ].filter(Boolean).join(' ')}
+                      onClick={() => moveChessPiece(square, displayPiece)}
+                    >
+                      {displayPiece ? (
+                        <span className={`chess-symbol ${displayPiece.color === 'w' ? 'white' : 'black'}`}>
+                          {chessPieces[`${displayPiece.color}${displayPiece.type}`]}
+                        </span>
+                      ) : null}
+                    </button>
+                  );
+                }),
+              )}
+            </div>
+            <small className="muted">Current chess mode supports castling, core movement, captures, and pawn promotion to queen.</small>
+          </>
+        ) : null}
+
+        {activeGame === 'tic-tac-toe' ? (
+          <>
+            <div className="arcade-play-header">
+              <p>
+                You are <strong className="mark-x">{playerMark}</strong>. Buddy AI is{' '}
+                <strong className="mark-o">{aiMark}</strong>.
+              </p>
+              <div className="arcade-control-row">
+                <Button onClick={() => resetTicTacToe('X')}>Play X</Button>
+                <Button variant="ghost" onClick={() => resetTicTacToe('O')}>Play O</Button>
+                <Button icon={RotateCcw} onClick={() => resetTicTacToe()}>Reset game</Button>
+              </div>
+            </div>
+            <p className="arcade-turn-label">
+              {ticTacToeWinner === 'draw'
+                ? 'Draw.'
+                : ticTacToeWinner
+                  ? ticTacToeWinner === playerMark ? 'You win.' : 'Buddy AI wins.'
+                  : 'Your turn'}
+            </p>
+            <div className="tic-tac-toe-board" aria-label="Tic-Tac-Toe board">
+              {ticTacToeBoard.map((cell, index) => (
+                <button type="button" key={index} onClick={() => playTicTacToe(index)} className={cell ? `filled ${cell}` : ''}>
+                  {cell}
                 </button>
-              );
-            })}
-          </div>
-        </Card>
-
-        <Card className="stack arcade-panel">
-          <h2>Leaderboard</h2>
-          {leaderboard.map((entry, index) => (
-            <div key={entry.id} className="arcade-leader-row">
-              <strong>{index + 1}. {entry.user?.full_name ?? 'PCCOE Player'}</strong>
-              <span>{entry.score} pts</span>
+              ))}
             </div>
-          ))}
-          {!leaderboard.length ? <p className="muted">Save a score to start the leaderboard.</p> : null}
-        </Card>
-      </div>
+          </>
+        ) : null}
+
+        {activeGame === 'sudoku' ? (
+          <>
+            <div className="arcade-play-header">
+              <p>Tip: press Check mistakes anytime.</p>
+              <div className="arcade-control-row">
+                <Button variant="ghost" onClick={() => setShowMistakes((current) => !current)}>Check mistakes</Button>
+                <Button onClick={resetSudoku}>New puzzle</Button>
+              </div>
+            </div>
+            <p className="arcade-turn-label">{sudokuComplete(sudokuGrid) ? 'Solved.' : 'Select a square, then choose a number.'}</p>
+            <div className="sudoku-board playable-sudoku-board" aria-label="Sudoku board">
+              {sudokuGrid.map((row, rowIndex) =>
+                row.map((value, columnIndex) => {
+                  const isGiven = Boolean(sudokuPuzzle[rowIndex][columnIndex]);
+                  const isSelected = selectedCell.row === rowIndex && selectedCell.column === columnIndex;
+                  const isMistake = showMistakes && value && Number(value) !== sudokuSolution[rowIndex][columnIndex];
+                  return (
+                    <button
+                      type="button"
+                      key={`${rowIndex}-${columnIndex}`}
+                      className={['sudoku-cell', isGiven ? 'given' : '', isSelected ? 'selected' : '', isMistake ? 'conflict' : '']
+                        .filter(Boolean)
+                        .join(' ')}
+                      onClick={() => setSelectedCell({ row: rowIndex, column: columnIndex })}
+                    >
+                      {value}
+                    </button>
+                  );
+                }),
+              )}
+            </div>
+            <div className="sudoku-keypad">
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((number) => (
+                <button type="button" key={number} onClick={() => setSudokuValue(String(number))}>
+                  {number}
+                </button>
+              ))}
+              <button type="button" onClick={() => setSudokuValue('')}>Clear</button>
+            </div>
+          </>
+        ) : null}
+      </Card>
     </section>
   );
 }

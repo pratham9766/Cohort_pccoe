@@ -1,4 +1,4 @@
-import { Bell, CalendarDays, Gamepad2, Handshake, Home, LogOut, Map, MessageCircle, MessageSquare, Moon, Search, Settings, Shuffle, Sun, User, Users } from 'lucide-react';
+import { Bell, CalendarDays, Flame, Gamepad2, Handshake, Home, ListTodo, LogOut, Map, MessageCircle, MessageSquare, Moon, Radio, Search, Settings, Shuffle, Sun, User, UserSearch, Users } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { Avatar } from '@/components/ui/Avatar.jsx';
 import { Button } from '@/components/ui/Button.jsx';
@@ -10,9 +10,13 @@ const navItems = [
   { to: '/dashboard/communities', label: 'Communities', icon: Users },
   { to: '/dashboard/friends', label: 'Friends', icon: Handshake },
   { to: '/dashboard/connect', label: 'Connect', icon: MessageCircle, badge: 3 },
+  { to: '/dashboard/campus-chat', label: 'Campus Chat', icon: Radio },
   { to: '/dashboard/xd', label: 'XD', icon: Shuffle },
   { to: '/dashboard/map', label: 'Map', icon: Map },
   { to: '/dashboard/calendar', label: 'Calendar', icon: CalendarDays },
+  { to: '/dashboard/todo', label: 'To-do', icon: ListTodo },
+  { to: '/dashboard/streaks', label: 'Streaks', icon: Flame },
+  { to: '/dashboard/study-buddy', label: 'Study Buddy', icon: UserSearch },
   { to: '/dashboard/arcade', label: 'Arcade', icon: Gamepad2 },
   { to: '/dashboard/headsup', label: 'HeadsUp', icon: Bell, badge: '99+' },
   { to: '/dashboard/settings', label: 'Contact Us', icon: MessageSquare },

@@ -38,6 +38,22 @@ export function useMessages(conversationId) {
   });
 }
 
+export function useCampusChatMessages() {
+  return useQuery({
+    queryKey: ['campus-chat-messages'],
+    queryFn: () =>
+      isDemoSessionActive()
+        ? []
+        : safeSupabaseQuery((db) =>
+            db
+              .from('campus_chat_messages')
+              .select('id, sender_id, content, created_at, sender:users(id, full_name, avatar_url, branch)')
+              .order('created_at', { ascending: false })
+              .limit(80),
+          ).then((rows) => rows.reverse()),
+  });
+}
+
 export function useXDPosts() {
   return useQuery({
     queryKey: ['xd-posts'],

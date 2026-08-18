@@ -1,6 +1,7 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import {
   CalendarDays,
+  Bot,
   Eye,
   Github,
   Grid2X2,
@@ -9,17 +10,24 @@ import {
   Mail,
   Map,
   MessageSquare,
+  Send,
   Radio,
   Sparkles,
   Sun,
   TrendingUp,
   UserRound,
+  X,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/Button.jsx';
+import { hasSupabaseConfig } from '@/lib/supabase.js';
 import { useUiStore } from '@/stores/uiStore.js';
 
 const LiquidEther = lazy(() => import('@/components/effects/LiquidEther.jsx'));
+const liquidEtherPalettes = {
+  dark: ['#5227FF', '#FF9FFC', '#B497CF'],
+  light: ['#d7cede', '#b385e0', '#ecd7cb'],
+};
 
 const stickers = [
   { src: '/stickers/spider-kick-color.png', className: 'sticker-swing-left' },
@@ -79,6 +87,19 @@ const features = [
   },
 ];
 
+const starterPrompts = [
+  'What can I do on Cohort?',
+  'How do I join communities?',
+  'Tell me about XD board.',
+];
+
+const initialChatMessages = [
+  {
+    role: 'assistant',
+    content: 'Hi, I am Cohort Buddy. Ask me about the platform, communities, login, campus tools, or arcade games.',
+  },
+];
+
 function LandingHeader() {
   const toggleTheme = useUiStore((state) => state.toggleTheme);
 
@@ -127,7 +148,114 @@ function StatsPanel() {
   );
 }
 
+function LandingChatbot() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState(initialChatMessages);
+  const [draft, setDraft] = useState('');
+  const [isSending, setIsSending] = useState(false);
+
+  const sendMessage = async (content) => {
+    const text = content.trim();
+    if (!text || isSending) return;
+
+    const nextMessages = [...messages, { role: 'user', content: text }];
+    setMessages(nextMessages);
+    setDraft('');
+
+    if (!hasSupabaseConfig) {
+      setMessages([
+        ...nextMessages,
+        {
+          role: 'assistant',
+          content: 'Chatbot setup is almost ready. Add Supabase env values and deploy the cohort-chatbot function first.',
+        },
+      ]);
+      return;
+    }
+
+    setIsSending(true);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/cohort-chatbot`, {
+        method: 'POST',
+        headers: {
+          apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ messages: nextMessages }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error ?? 'Chatbot is unavailable right now.');
+      setMessages([...nextMessages, { role: 'assistant', content: data.reply }]);
+    } catch (error) {
+      setMessages([...nextMessages, { role: 'assistant', content: error.message }]);
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const submitMessage = (event) => {
+    event.preventDefault();
+    sendMessage(draft);
+  };
+
+  return (
+    <aside className={`landing-chatbot ${isOpen ? 'open' : ''}`} aria-label="Cohort Buddy chatbot">
+      {isOpen ? (
+        <div className="chatbot-panel">
+          <header>
+            <div>
+              <span><Bot size={18} aria-hidden="true" /></span>
+              <strong>Cohort Buddy</strong>
+            </div>
+            <button type="button" aria-label="Close chatbot" onClick={() => setIsOpen(false)}>
+              <X size={18} aria-hidden="true" />
+            </button>
+          </header>
+
+          <div className="chatbot-messages" aria-live="polite">
+            {messages.map((message, index) => (
+              <div key={`${message.role}-${index}`} className={`chatbot-message ${message.role}`}>
+                {message.content}
+              </div>
+            ))}
+            {isSending ? <div className="chatbot-message assistant">Thinking...</div> : null}
+          </div>
+
+          <div className="chatbot-prompts">
+            {starterPrompts.map((prompt) => (
+              <button type="button" key={prompt} onClick={() => sendMessage(prompt)}>
+                {prompt}
+              </button>
+            ))}
+          </div>
+
+          <form className="chatbot-form" onSubmit={submitMessage}>
+            <input
+              value={draft}
+              onChange={(event) => setDraft(event.target.value)}
+              placeholder="Ask about Cohort..."
+              maxLength={500}
+              aria-label="Chat message"
+            />
+            <button type="submit" aria-label="Send message" disabled={!draft.trim() || isSending}>
+              <Send size={18} aria-hidden="true" />
+            </button>
+          </form>
+        </div>
+      ) : null}
+
+      <button type="button" className="chatbot-launcher" aria-label="Open Cohort Buddy chatbot" onClick={() => setIsOpen(true)}>
+        <Bot size={24} aria-hidden="true" />
+      </button>
+    </aside>
+  );
+}
+
 export default function LandingPage() {
+  const theme = useUiStore((state) => state.theme);
+  const isLightTheme = theme === 'light';
+
   return (
     <main className="landing-page">
       <div className="landing-backdrop" aria-hidden="true" />
@@ -142,18 +270,18 @@ export default function LandingPage() {
             pointerEvents: 'none',
             zIndex: 0,
           }}
-          colors={['#5227FF', '#FF9FFC', '#B497CF']}
-          mouseForce={12}
-          cursorSize={120}
-          isViscous={false}
+          colors={isLightTheme ? liquidEtherPalettes.light : liquidEtherPalettes.dark}
+          mouseForce={isLightTheme ? 20 : 12}
+          cursorSize={isLightTheme ? 100 : 120}
+          isViscous={isLightTheme}
           viscous={30}
           iterationsViscous={32}
           iterationsPoisson={32}
-          resolution={0.38}
+          resolution={isLightTheme ? 0.5 : 0.38}
           isBounce={false}
           autoDemo
-          autoSpeed={0.42}
-          autoIntensity={1.45}
+          autoSpeed={isLightTheme ? 0.5 : 0.42}
+          autoIntensity={isLightTheme ? 2.2 : 1.45}
           takeoverDuration={0.25}
           autoResumeDelay={3000}
           autoRampDuration={0.6}
@@ -264,6 +392,7 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+      <LandingChatbot />
     </main>
   );
 }

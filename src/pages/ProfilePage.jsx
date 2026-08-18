@@ -1,7 +1,14 @@
-import { Award, Users } from 'lucide-react';
+import { Flag, Puzzle, UserPlus, Users } from 'lucide-react';
 import { ProfileSummary } from '@/components/features/profile/ProfileSummary.jsx';
 import { Card } from '@/components/ui/Card.jsx';
 import { useAuthStore } from '@/stores/authStore.js';
+
+const profileStats = [
+  { icon: Users, value: 5, label: 'Communities', artwork: '/stickers/spider-dive.jpeg' },
+  { icon: UserPlus, value: 0, label: 'Followers', artwork: '/stickers/spider-sit.jpeg' },
+  { icon: Puzzle, value: 3, label: 'Following', artwork: '/stickers/spider-crouch.jpeg' },
+  { icon: Flag, value: 0, label: 'Flex', artwork: '/stickers/spider-hang.jpeg' },
+];
 
 export default function ProfilePage() {
   const user = useAuthStore((state) => state.user);
@@ -14,18 +21,44 @@ export default function ProfilePage() {
   }
 
   return (
-    <section className="page stack">
+    <section className="page profile-page">
       <ProfileSummary user={user} />
-      <div className="grid two">
-        <Card className="stack">
-          <h2><Award size={20} aria-hidden="true" /> Achievements</h2>
-          <p className="muted">Hackathon winner, security meetup host, GDGC study jam mentor.</p>
-        </Card>
-        <Card className="stack">
-          <h2><Users size={20} aria-hidden="true" /> Communities</h2>
-          <p className="muted">GDGC PCCOE, ACM PCCOE, NSS PCCOE</p>
-        </Card>
+
+      <div className="profile-stat-grid" aria-label="Profile stats">
+        {profileStats.map((stat) => (
+          <Card key={stat.label} className="profile-stat-card">
+            <img src={stat.artwork} alt="" aria-hidden="true" />
+            <stat.icon size={22} aria-hidden="true" />
+            <strong>{stat.value}</strong>
+            <span>{stat.label}</span>
+          </Card>
+        ))}
       </div>
+
+      <section className="profile-activity" aria-labelledby="profile-activity-heading">
+        <div className="profile-section-title">
+          <h2 id="profile-activity-heading">Activity</h2>
+          <span />
+        </div>
+
+        <div className="profile-tabs" role="tablist" aria-label="Profile activity">
+          <button type="button" className="active" role="tab" aria-selected="true">
+            Posts <span>0</span>
+          </button>
+          <button type="button" role="tab" aria-selected="false">
+            Replies <span>0</span>
+          </button>
+        </div>
+
+        <div className="profile-empty-state">
+          <img src="/stickers/spider-hang.jpeg" alt="" aria-hidden="true" />
+          <p>No posts yet.</p>
+        </div>
+        <button type="button" className="profile-help-button" aria-label="Open assistant">
+          <span />
+          <span />
+        </button>
+      </section>
     </section>
   );
 }

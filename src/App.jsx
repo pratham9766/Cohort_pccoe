@@ -14,11 +14,15 @@ const DashboardPage = lazy(() => import('@/pages/DashboardPage.jsx'));
 const CommunitiesPage = lazy(() => import('@/pages/CommunitiesPage.jsx'));
 const CommunityDetailPage = lazy(() => import('@/pages/CommunityDetailPage.jsx'));
 const ConnectPage = lazy(() => import('@/pages/ConnectPage.jsx'));
+const CampusChatPage = lazy(() => import('@/pages/CampusChatPage.jsx'));
 const XDPage = lazy(() => import('@/pages/XDPage.jsx'));
 const ArcadePage = lazy(() => import('@/pages/ArcadePage.jsx'));
 const HeadsUpPage = lazy(() => import('@/pages/HeadsUpPage.jsx'));
 const MapPage = lazy(() => import('@/pages/MapPage.jsx'));
 const CalendarPage = lazy(() => import('@/pages/CalendarPage.jsx'));
+const ToDoPage = lazy(() => import('@/pages/ToDoPage.jsx'));
+const CampusStreaksPage = lazy(() => import('@/pages/CampusStreaksPage.jsx'));
+const StudyBuddyPage = lazy(() => import('@/pages/StudyBuddyPage.jsx'));
 const FriendsPage = lazy(() => import('@/pages/FriendsPage.jsx'));
 const ProfilePage = lazy(() => import('@/pages/ProfilePage.jsx'));
 const SettingsPage = lazy(() => import('@/pages/SettingsPage.jsx'));
@@ -87,12 +91,16 @@ export default function App() {
             <Route path="dashboard/communities/:communityId" element={<CommunityDetailPage />} />
             <Route path="dashboard/connect" element={<ConnectPage />} />
             <Route path="dashboard/connect/:chatId" element={<ConnectPage />} />
+            <Route path="dashboard/campus-chat" element={<CampusChatPage />} />
             <Route path="dashboard/xd" element={<XDPage />} />
             <Route path="dashboard/xd/:postId" element={<XDPage />} />
             <Route path="dashboard/arcade" element={<ArcadePage />} />
             <Route path="dashboard/headsup" element={<HeadsUpPage />} />
             <Route path="dashboard/map" element={<MapPage />} />
             <Route path="dashboard/calendar" element={<CalendarPage />} />
+            <Route path="dashboard/todo" element={<ToDoPage />} />
+            <Route path="dashboard/streaks" element={<CampusStreaksPage />} />
+            <Route path="dashboard/study-buddy" element={<StudyBuddyPage />} />
             <Route path="dashboard/friends" element={<FriendsPage />} />
             <Route path="dashboard/profile" element={<ProfilePage />} />
             <Route path="dashboard/profile/:userId" element={<ProfilePage />} />
@@ -101,12 +109,16 @@ export default function App() {
             <Route path="communities/:communityId" element={<CommunityDetailPage />} />
             <Route path="connect" element={<ConnectPage />} />
             <Route path="connect/:chatId" element={<ConnectPage />} />
+            <Route path="campus-chat" element={<CampusChatPage />} />
             <Route path="xd" element={<XDPage />} />
             <Route path="xd/:postId" element={<XDPage />} />
             <Route path="arcade" element={<ArcadePage />} />
             <Route path="headsup" element={<HeadsUpPage />} />
             <Route path="map" element={<MapPage />} />
             <Route path="calendar" element={<CalendarPage />} />
+            <Route path="todo" element={<ToDoPage />} />
+            <Route path="streaks" element={<CampusStreaksPage />} />
+            <Route path="study-buddy" element={<StudyBuddyPage />} />
             <Route path="friends" element={<FriendsPage />} />
             <Route path="profile" element={<ProfilePage />} />
             <Route path="profile/:userId" element={<ProfilePage />} />

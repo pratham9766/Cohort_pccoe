@@ -1,0 +1,2 @@
+[functions.cohort-chatbot]
+verify_jwt = false

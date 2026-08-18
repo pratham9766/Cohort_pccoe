@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { calendarEvents, campusLocations, campusPeople, communities, conversations, messages, posts, xdPosts } from '@/lib/constants.js';
+import { calendarEvents, campusLocations, campusPeople, communities, conversations, messages, posts, techNews, xdPosts } from '@/lib/constants.js';
 import { isDemoSessionActive } from '@/lib/demo.js';
 import { safeSupabaseQuery } from '@/lib/supabase.js';
 
@@ -101,6 +101,23 @@ export function useArcadeLeaderboard() {
                 .order('score', { ascending: false })
                 .order('created_at', { ascending: false })
                 .limit(5),
+          ),
+  });
+}
+
+export function useTechNews() {
+  return useQuery({
+    queryKey: ['tech-news'],
+    queryFn: () =>
+      isDemoSessionActive()
+        ? techNews
+        : safeSupabaseQuery(
+            (db) =>
+              db
+                .from('tech_news')
+                .select('id, title, summary, source, url, category, published_at, fetched_at')
+                .order('published_at', { ascending: false })
+                .limit(12),
           ),
   });
 }

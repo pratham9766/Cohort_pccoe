@@ -277,3 +277,33 @@ export const campusLocations = [
   { id: 'l3', name: 'Computer Lab 3', category: 'lab', building: 'Comp Department', floor: 'Second', latitude: 18.6283, longitude: 73.8398, description: 'Programming lab and workshop room.' },
   { id: 'l4', name: 'Seminar Hall B', category: 'classroom', building: 'Academic Block', floor: 'First', latitude: 18.6287, longitude: 73.8401, description: 'Talks, workshops, and club events.' },
 ];
+
+export const techNews = [
+  {
+    id: 'tn1',
+    title: 'Open source AI tooling keeps moving into everyday developer workflows',
+    summary: 'Teams are combining code assistants, local models, and review automation to shorten prototype cycles.',
+    source: 'Cohort Tech Desk',
+    url: 'https://news.ycombinator.com/',
+    category: 'AI',
+    published_at: 'Today',
+  },
+  {
+    id: 'tn2',
+    title: 'Frontend teams standardize on faster build pipelines',
+    summary: 'Vite, incremental bundling, and edge deployment patterns are becoming the default for student projects and startups.',
+    source: 'Cohort Tech Desk',
+    url: 'https://vercel.com/blog',
+    category: 'Web',
+    published_at: 'Today',
+  },
+  {
+    id: 'tn3',
+    title: 'Postgres remains the practical backend choice for campus products',
+    summary: 'Realtime APIs, row-level security, and hosted Postgres make it easier to ship secure student apps quickly.',
+    source: 'Cohort Tech Desk',
+    url: 'https://supabase.com/blog',
+    category: 'Backend',
+    published_at: 'Today',
+  },
+];

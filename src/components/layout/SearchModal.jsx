@@ -16,7 +16,7 @@ export function SearchModal() {
     const q = query.trim().toLowerCase();
     if (!q) return [];
     return [
-      ...communities.filter((item) => item.name.toLowerCase().includes(q)).map((item) => ({ label: item.name, type: 'Community', to: `/communities/${item.slug}` })),
+      ...communities.filter((item) => item.name.toLowerCase().includes(q)).map((item) => ({ label: item.name, type: 'Community', to: `/dashboard/communities/${item.slug}` })),
       ...posts.filter((item) => item.content.toLowerCase().includes(q)).map((item) => ({ label: item.content, type: 'Post', to: '/dashboard' })),
     ].slice(0, 8);
   }, [query]);

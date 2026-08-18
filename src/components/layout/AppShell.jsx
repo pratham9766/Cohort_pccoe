@@ -30,6 +30,10 @@ export function AppShell() {
 
   return (
     <div className="app-shell">
+      <div className="site-effects" aria-hidden="true">
+        <span className="light-ray ray-one" />
+        <span className="light-ray ray-two" />
+      </div>
       <Sidebar />
       <div className="app-main">
         <TopNav />

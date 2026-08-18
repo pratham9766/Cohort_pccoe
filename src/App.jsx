@@ -70,6 +70,17 @@ export default function App() {
           <Route path="/onboarding" element={<OnboardingPage />} />
           <Route path="/" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
             <Route path="dashboard" element={<DashboardPage />} />
+            <Route path="dashboard/communities" element={<CommunitiesPage />} />
+            <Route path="dashboard/communities/:communityId" element={<CommunityDetailPage />} />
+            <Route path="dashboard/connect" element={<ConnectPage />} />
+            <Route path="dashboard/connect/:chatId" element={<ConnectPage />} />
+            <Route path="dashboard/xd" element={<XDPage />} />
+            <Route path="dashboard/xd/:postId" element={<XDPage />} />
+            <Route path="dashboard/map" element={<MapPage />} />
+            <Route path="dashboard/calendar" element={<CalendarPage />} />
+            <Route path="dashboard/profile" element={<ProfilePage />} />
+            <Route path="dashboard/profile/:userId" element={<ProfilePage />} />
+            <Route path="dashboard/settings" element={<SettingsPage />} />
             <Route path="communities" element={<CommunitiesPage />} />
             <Route path="communities/:communityId" element={<CommunityDetailPage />} />
             <Route path="connect" element={<ConnectPage />} />

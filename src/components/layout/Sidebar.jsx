@@ -7,12 +7,12 @@ import { useUiStore } from '@/stores/uiStore.js';
 
 const navItems = [
   { to: '/dashboard', label: 'Home', icon: Home },
-  { to: '/communities', label: 'Communities', icon: Users },
-  { to: '/connect', label: 'Connect', icon: MessageCircle, badge: 3 },
-  { to: '/xd', label: 'XD Board', icon: Shuffle },
-  { to: '/map', label: 'Campus Map', icon: Map },
-  { to: '/calendar', label: 'Calendar', icon: CalendarDays },
-  { to: '/profile', label: 'Profile', icon: User },
+  { to: '/dashboard/communities', label: 'Communities', icon: Users },
+  { to: '/dashboard/connect', label: 'Connect', icon: MessageCircle, badge: 3 },
+  { to: '/dashboard/xd', label: 'XD Board', icon: Shuffle },
+  { to: '/dashboard/map', label: 'Campus Map', icon: Map },
+  { to: '/dashboard/calendar', label: 'Calendar', icon: CalendarDays },
+  { to: '/dashboard/profile', label: 'Profile', icon: User },
 ];
 
 export function Sidebar() {
@@ -23,7 +23,9 @@ export function Sidebar() {
   return (
     <aside className="sidebar glass-sidebar">
       <NavLink to="/dashboard" className="brand">
-        <span className="brand-mark">C</span>
+        <span className="brand-mark" aria-hidden="true">
+          <img src="/cohort-logo.png" alt="" />
+        </span>
         <span>
           <strong>COHORT</strong>
           <small>PCCOE</small>
@@ -46,7 +48,7 @@ export function Sidebar() {
 
       <nav className="sidebar-nav" aria-label="Primary navigation">
         {navItems.map((item) => (
-          <NavLink key={item.to} to={item.to} className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+          <NavLink key={item.to} to={item.to} end={item.to === '/dashboard'} className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
             <item.icon size={20} aria-hidden="true" />
             <span>{item.label}</span>
             {item.badge ? <b>{item.badge}</b> : null}
@@ -55,7 +57,7 @@ export function Sidebar() {
       </nav>
 
       <div className="sidebar-footer">
-        <NavLink to="/settings" className="nav-link">
+        <NavLink to="/dashboard/settings" className="nav-link">
           <Settings size={20} aria-hidden="true" />
           <span>Settings</span>
         </NavLink>

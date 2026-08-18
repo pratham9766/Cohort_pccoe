@@ -24,12 +24,12 @@ export default function ConnectPage() {
   }, [activeId, chatId]);
 
   useEffect(() => {
-    if (!chatId && activeId) navigate(`/connect/${activeId}`, { replace: true });
+    if (!chatId && activeId) navigate(`/dashboard/connect/${activeId}`, { replace: true });
   }, [activeId, chatId, navigate]);
 
   function selectConversation(id) {
     setActiveId(id);
-    navigate(`/connect/${id}`);
+    navigate(`/dashboard/connect/${id}`);
   }
 
   function sendDemoMessage(body) {

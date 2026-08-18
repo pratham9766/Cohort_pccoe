@@ -1,11 +1,43 @@
 .app-shell {
+  position: relative;
   display: grid;
   min-height: 100vh;
   grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
 }
 
+.site-effects {
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.light-ray {
+  position: absolute;
+  width: 34rem;
+  height: 9rem;
+  border-radius: 999px;
+  filter: blur(46px);
+  opacity: 0.18;
+  transform: rotate(-18deg);
+}
+
+.ray-one {
+  top: 7%;
+  left: 22%;
+  background: rgba(63, 110, 216, 0.72);
+}
+
+.ray-two {
+  top: 19%;
+  right: -10%;
+  background: rgba(45, 178, 163, 0.62);
+}
+
 .sidebar {
   position: sticky;
+  z-index: 3;
   top: 0;
   display: flex;
   height: 100vh;
@@ -23,13 +55,19 @@
 
 .brand-mark {
   display: grid;
-  width: 42px;
-  height: 42px;
+  width: 46px;
+  height: 46px;
   place-items: center;
   border-radius: var(--radius-md);
-  background: var(--brand-gradient);
-  box-shadow: var(--shadow-brand);
+  background: #fff;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.32);
   font-weight: 900;
+}
+
+.brand-mark img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
 }
 
 .brand small,
@@ -45,7 +83,7 @@
   align-items: center;
   gap: var(--space-3);
   border: 1px solid var(--border-default);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   background: var(--glass-bg);
   padding: var(--space-3);
 }
@@ -84,7 +122,7 @@
 
 .nav-link.active,
 .nav-link:hover {
-  background: var(--glass-active);
+  background: linear-gradient(90deg, rgba(63, 110, 216, 0.18), rgba(45, 178, 163, 0.08));
   color: var(--text-primary);
 }
 
@@ -128,9 +166,24 @@
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--border-default);
-  background: rgba(11, 14, 26, 0.84);
+  background: rgba(5, 5, 5, 0.84);
   padding: 0 var(--space-4);
   backdrop-filter: blur(16px);
+}
+
+.top-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-display);
+}
+
+.top-brand img {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: #fff;
+  object-fit: contain;
 }
 
 .content {
@@ -149,7 +202,7 @@
   justify-content: space-around;
   border: 1px solid var(--border-default);
   border-radius: var(--radius-xl);
-  background: rgba(11, 14, 26, 0.9);
+  background: rgba(5, 5, 5, 0.92);
   padding: var(--space-2);
   backdrop-filter: blur(20px);
 }

@@ -61,7 +61,7 @@ export default function CommunitiesPage() {
           <CommunityCard
             key={community.id}
             community={community}
-            onOpen={() => navigate(`/communities/${community.slug}`)}
+            onOpen={() => navigate(`/dashboard/communities/${community.slug}`)}
             onToggle={() => toggleSubscription(community)}
           />
         ))}

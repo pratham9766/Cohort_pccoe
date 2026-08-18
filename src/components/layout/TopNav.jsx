@@ -12,7 +12,10 @@ export function TopNav() {
   return (
     <header className="top-nav">
       <Button variant="ghost" icon={Menu} aria-label="Open navigation" onClick={toggleSidebar} />
-      <strong>COHORT PCCOE</strong>
+      <strong className="top-brand">
+        <img src="/cohort-logo.png" alt="" />
+        COHORT PCCOE
+      </strong>
       <div className="cluster">
         <Button variant="ghost" icon={Search} aria-label="Open search" onClick={() => setSearchOpen(true)} />
         <button type="button" className="bell-button" aria-label="Open notifications" onClick={() => setNotificationPanelOpen(true)}>

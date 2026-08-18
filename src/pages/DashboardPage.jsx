@@ -1,5 +1,6 @@
-import { CalendarDays, Users } from 'lucide-react';
+import { CalendarDays, MapPin, MessageSquare, Sparkles, Users } from 'lucide-react';
 import { useMemo } from 'react';
+import { NavLink } from 'react-router-dom';
 import { EventCard } from '@/components/features/calendar/EventCard.jsx';
 import { CommunityCard } from '@/components/features/communities/CommunityCard.jsx';
 import { PostCard } from '@/components/features/feed/PostCard.jsx';
@@ -19,12 +20,40 @@ export default function DashboardPage() {
 
   return (
     <section className="page">
-      <div className="page-header">
+      <div className="page-header dashboard-hero">
         <div>
           <p className="eyebrow">Discover. Connect. Collaborate.</p>
-          <h1 className="page-title">Campus Feed</h1>
+          <h1 className="page-title">Cohort PCCOE</h1>
+          <p className="muted">Your student-led campus hub for communities, conversations, events, and opportunities.</p>
+        </div>
+        <div className="hero-logo" aria-hidden="true">
+          <img src="/cohort-logo.png" alt="" />
         </div>
       </div>
+
+      <div className="module-strip" aria-label="Cohort quick links">
+        <NavLink to="/dashboard/communities">
+          <Users size={18} aria-hidden="true" />
+          <span>Communities</span>
+          <strong>{comms.length}</strong>
+        </NavLink>
+        <NavLink to="/dashboard/connect">
+          <MessageSquare size={18} aria-hidden="true" />
+          <span>Connect</span>
+          <strong>Secure</strong>
+        </NavLink>
+        <NavLink to="/dashboard/xd">
+          <Sparkles size={18} aria-hidden="true" />
+          <span>XD Board</span>
+          <strong>{feed.length + 3}</strong>
+        </NavLink>
+        <NavLink to="/dashboard/map">
+          <MapPin size={18} aria-hidden="true" />
+          <span>Campus Map</span>
+          <strong>Live</strong>
+        </NavLink>
+      </div>
+
       <div className="dashboard-grid">
         <div className="stack">
           <PostComposer />

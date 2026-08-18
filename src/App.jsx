@@ -19,6 +19,7 @@ const ArcadePage = lazy(() => import('@/pages/ArcadePage.jsx'));
 const HeadsUpPage = lazy(() => import('@/pages/HeadsUpPage.jsx'));
 const MapPage = lazy(() => import('@/pages/MapPage.jsx'));
 const CalendarPage = lazy(() => import('@/pages/CalendarPage.jsx'));
+const FriendsPage = lazy(() => import('@/pages/FriendsPage.jsx'));
 const ProfilePage = lazy(() => import('@/pages/ProfilePage.jsx'));
 const SettingsPage = lazy(() => import('@/pages/SettingsPage.jsx'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage.jsx'));
@@ -92,6 +93,7 @@ export default function App() {
             <Route path="dashboard/headsup" element={<HeadsUpPage />} />
             <Route path="dashboard/map" element={<MapPage />} />
             <Route path="dashboard/calendar" element={<CalendarPage />} />
+            <Route path="dashboard/friends" element={<FriendsPage />} />
             <Route path="dashboard/profile" element={<ProfilePage />} />
             <Route path="dashboard/profile/:userId" element={<ProfilePage />} />
             <Route path="dashboard/settings" element={<SettingsPage />} />
@@ -105,6 +107,7 @@ export default function App() {
             <Route path="headsup" element={<HeadsUpPage />} />
             <Route path="map" element={<MapPage />} />
             <Route path="calendar" element={<CalendarPage />} />
+            <Route path="friends" element={<FriendsPage />} />
             <Route path="profile" element={<ProfilePage />} />
             <Route path="profile/:userId" element={<ProfilePage />} />
             <Route path="settings" element={<SettingsPage />} />

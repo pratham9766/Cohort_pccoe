@@ -8,7 +8,7 @@ import { useUiStore } from '@/stores/uiStore.js';
 const navItems = [
   { to: '/dashboard', label: 'Home', icon: Home },
   { to: '/dashboard/communities', label: 'Communities', icon: Users },
-  { to: '/dashboard/profile', label: 'Friends', icon: Handshake },
+  { to: '/dashboard/friends', label: 'Friends', icon: Handshake },
   { to: '/dashboard/connect', label: 'Connect', icon: MessageCircle, badge: 3 },
   { to: '/dashboard/xd', label: 'XD', icon: Shuffle },
   { to: '/dashboard/map', label: 'Map', icon: Map },

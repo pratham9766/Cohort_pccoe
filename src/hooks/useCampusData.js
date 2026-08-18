@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { calendarEvents, campusLocations, communities, conversations, messages, posts, xdPosts } from '@/lib/constants.js';
+import { calendarEvents, campusLocations, campusPeople, communities, conversations, messages, posts, xdPosts } from '@/lib/constants.js';
 import { isDemoSessionActive } from '@/lib/demo.js';
 import { safeSupabaseQuery } from '@/lib/supabase.js';
 
@@ -56,6 +56,23 @@ export function useCampusLocations() {
   return useQuery({
     queryKey: ['campus-locations'],
     queryFn: () => (isDemoSessionActive() ? campusLocations : safeSupabaseQuery((db) => db.from('campus_locations').select('*').order('name'))),
+  });
+}
+
+export function useCampusPeople() {
+  return useQuery({
+    queryKey: ['campus-people'],
+    queryFn: () =>
+      isDemoSessionActive()
+        ? campusPeople
+        : safeSupabaseQuery(
+            (db) =>
+              db
+                .from('users')
+                .select('id, full_name, username, avatar_url, branch, year, bio, skills, interests, last_seen_at')
+                .order('full_name')
+                .limit(50),
+          ),
   });
 }
 

@@ -1,5 +1,5 @@
 import { ArrowRight, Search } from 'lucide-react';
-import { useCalendarEvents, useCommunities, useConversations } from '@/hooks/useCampusData.js';
+import { useCalendarEvents, useCampusPeople, useCommunities, useConversations } from '@/hooks/useCampusData.js';
 import { useUiStore } from '@/stores/uiStore.js';
 
 function RailSection({ title, empty, children }) {
@@ -17,6 +17,7 @@ function RailSection({ title, empty, children }) {
 export function RightRail() {
   const openSearch = useUiStore((state) => state.setSearchOpen);
   const { data: communities = [] } = useCommunities();
+  const { data: people = [] } = useCampusPeople();
   const { data: conversations = [] } = useConversations();
   const { data: events = [] } = useCalendarEvents();
 
@@ -35,7 +36,11 @@ export function RightRail() {
           : null}
       </RailSection>
 
-      <RailSection title="C/FRIENDS" empty="No users yet" />
+      <RailSection title="C/FRIENDS" empty="No users yet">
+        {people.length
+          ? people.slice(0, 3).map((person) => <p key={person.id} className="rail-item">{person.full_name}</p>)
+          : null}
+      </RailSection>
 
       <RailSection title="C/CONNECT" empty="No users available">
         {conversations.length

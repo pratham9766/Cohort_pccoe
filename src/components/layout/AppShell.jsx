@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import { useCallback } from 'react';
 import { BottomNav } from './BottomNav.jsx';
+import { AppStickers } from './AppStickers.jsx';
 import { NotificationPanel } from './NotificationPanel.jsx';
 import { SearchModal } from './SearchModal.jsx';
 import { RightRail } from './RightRail.jsx';
@@ -37,6 +38,7 @@ export function AppShell() {
       </div>
       <Sidebar />
       <div className="app-main">
+        <AppStickers />
         <TopNav />
         <main className="content">
           <Outlet />

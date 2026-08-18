@@ -298,6 +298,55 @@ html[data-theme='light'] .app-shell {
   border-left: 1px solid var(--border-default);
 }
 
+.app-stickers {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.app-sticker,
+.rail-float {
+  position: absolute;
+  display: block;
+  width: var(--sticker-size, 86px);
+  height: auto;
+  filter: invert(1) contrast(1.16);
+  mix-blend-mode: screen;
+  opacity: 0.86;
+  pointer-events: none;
+  user-select: none;
+}
+
+.sticker-home-top {
+  --sticker-size: 78px;
+  top: 0.75rem;
+  left: clamp(4.5rem, 8vw, 8rem);
+  transform: rotate(4deg);
+}
+
+.sticker-home-left {
+  --sticker-size: 88px;
+  top: min(52vh, 32rem);
+  left: -1.25rem;
+  transform: rotate(-8deg);
+}
+
+.sticker-home-bottom {
+  --sticker-size: 72px;
+  right: clamp(2rem, 7vw, 6rem);
+  bottom: 2.75rem;
+  transform: rotate(10deg);
+}
+
+html[data-theme='light'] .app-sticker,
+html[data-theme='light'] .rail-float {
+  filter: contrast(1.08);
+  mix-blend-mode: multiply;
+  opacity: 0.72;
+}
+
 .app-main::before {
   position: absolute;
   inset: 0;
@@ -365,6 +414,36 @@ html[data-theme='light'] .app-main::before {
   overflow: auto;
   padding: var(--space-4);
   background: rgba(5, 5, 5, 0.96);
+  isolation: isolate;
+}
+
+.right-rail > :not(.rail-float) {
+  position: relative;
+  z-index: 1;
+}
+
+.rail-float-search {
+  --sticker-size: 78px;
+  top: 0.25rem;
+  right: 5.5rem;
+  z-index: 0;
+  transform: rotate(8deg);
+}
+
+.rail-float-mid {
+  --sticker-size: 86px;
+  top: 19rem;
+  right: 1.75rem;
+  z-index: 0;
+  transform: rotate(-4deg);
+}
+
+.rail-float-bottom {
+  --sticker-size: 88px;
+  right: 7rem;
+  bottom: 2rem;
+  z-index: 0;
+  transform: rotate(7deg);
 }
 
 html[data-theme='light'] .right-rail {
@@ -629,6 +708,10 @@ html[data-theme='light'] .search-chip {
   .right-rail {
     display: none;
   }
+
+  .sticker-home-bottom {
+    display: none;
+  }
 }
 
 @media (max-height: 940px) and (min-width: 861px) {
@@ -665,6 +748,10 @@ html[data-theme='light'] .search-chip {
   }
 
   .sidebar {
+    display: none;
+  }
+
+  .app-stickers {
     display: none;
   }
 

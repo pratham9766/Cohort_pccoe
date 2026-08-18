@@ -22,6 +22,7 @@ export function RightRail() {
 
   return (
     <aside className="right-rail">
+      <img className="rail-float rail-float-search" src="/stickers/spider-crouch.jpeg" alt="" aria-hidden="true" />
       <button type="button" className="rail-search" onClick={() => openSearch(true)}>
         <Search size={17} aria-hidden="true" />
         <span>Search cohort</span>
@@ -41,6 +42,7 @@ export function RightRail() {
           ? conversations.slice(0, 2).map((conversation) => <p key={conversation.id} className="rail-item">{conversation.name}</p>)
           : null}
       </RailSection>
+      <img className="rail-float rail-float-mid" src="/stickers/spider-dive.jpeg" alt="" aria-hidden="true" />
 
       <RailSection title="C/CALENDAR" empty="No upcoming events">
         {events.length
@@ -54,6 +56,7 @@ export function RightRail() {
       </RailSection>
 
       <div className="rail-sticker" aria-hidden="true">SPIDER-MAN</div>
+      <img className="rail-float rail-float-bottom" src="/stickers/spider-sit.jpeg" alt="" aria-hidden="true" />
     </aside>
   );
 }

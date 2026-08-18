@@ -1,7 +1,11 @@
 import { CheckCircle2, Gamepad2, RotateCcw, Timer, Trophy, Zap } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/Button.jsx';
 import { Card } from '@/components/ui/Card.jsx';
+import { useArcadeLeaderboard } from '@/hooks/useCampusData.js';
+import { saveArcadeScore } from '@/lib/api.js';
+import { useNotificationStore } from '@/stores/notificationStore.js';
 
 const quizQuestions = [
   {
@@ -24,12 +28,16 @@ const quizQuestions = [
 const memorySeed = ['GDGC', 'NSS', 'ACM', 'E-Cell', 'GDGC', 'NSS', 'ACM', 'E-Cell'];
 
 export default function ArcadePage() {
+  const queryClient = useQueryClient();
+  const { data: leaderboard = [] } = useArcadeLeaderboard();
+  const addToast = useNotificationStore((state) => state.addToast);
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const [score, setScore] = useState(0);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [flipped, setFlipped] = useState([]);
   const [matched, setMatched] = useState([]);
   const [streak, setStreak] = useState(0);
+  const [saving, setSaving] = useState(false);
   const question = quizQuestions[questionIndex];
 
   const memoryCards = useMemo(
@@ -76,6 +84,25 @@ export default function ArcadePage() {
     setStreak(0);
   };
 
+  const saveScore = async () => {
+    if (!score) return;
+    setSaving(true);
+    try {
+      await saveArcadeScore({
+        score,
+        streak,
+        matches: matched.length,
+        metadata: { questionIndex, completedPairs: matched },
+      });
+      queryClient.invalidateQueries({ queryKey: ['arcade-leaderboard'] });
+      addToast('Arcade score saved.', 'success');
+    } catch (error) {
+      addToast(error.message, 'error');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <section className="page stack">
       <div className="page-header">
@@ -85,6 +112,9 @@ export default function ArcadePage() {
         </div>
         <Button variant="ghost" icon={RotateCcw} onClick={resetArcade}>
           Reset
+        </Button>
+        <Button icon={Trophy} disabled={!score || saving} onClick={saveScore}>
+          {saving ? 'Saving...' : 'Save Score'}
         </Button>
       </div>
 
@@ -147,6 +177,17 @@ export default function ArcadePage() {
               );
             })}
           </div>
+        </Card>
+
+        <Card className="stack arcade-panel">
+          <h2>Leaderboard</h2>
+          {leaderboard.map((entry, index) => (
+            <div key={entry.id} className="arcade-leader-row">
+              <strong>{index + 1}. {entry.user?.full_name ?? 'PCCOE Player'}</strong>
+              <span>{entry.score} pts</span>
+            </div>
+          ))}
+          {!leaderboard.length ? <p className="muted">Save a score to start the leaderboard.</p> : null}
         </Card>
       </div>
     </section>

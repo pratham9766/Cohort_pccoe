@@ -207,3 +207,22 @@
   border-color: var(--brand-primary);
   color: var(--text-primary);
 }
+
+.arcade-leader-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  border-bottom: 1px solid var(--border-default);
+  padding: var(--space-2) 0;
+}
+
+.arcade-leader-row span {
+  color: var(--accent-cyan);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.headsup-alert.info {
+  border-left-color: var(--accent-blue);
+}

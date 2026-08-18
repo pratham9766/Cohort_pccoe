@@ -16,7 +16,7 @@ export default function ConnectPage() {
   const queryClient = useQueryClient();
   const addToast = useNotificationStore((state) => state.addToast);
   const { data: conversations = [] } = useConversations();
-  const [activeId, setActiveId] = useState(chatId ?? conversations[0]?.id ?? 'c1');
+  const [activeId, setActiveId] = useState(chatId ?? null);
   const { data: chatMessages = [] } = useMessages(activeId);
   const renderedMessages = useMemo(() => chatMessages.map((message) => ({ ...message, mine: message.sender_id === user?.id })), [chatMessages, user?.id]);
   const active = conversations.find((item) => item.id === activeId) ?? conversations[0];
@@ -28,8 +28,12 @@ export default function ConnectPage() {
   }, [activeId, chatId]);
 
   useEffect(() => {
+    if (!activeId && conversations[0]?.id) {
+      setActiveId(conversations[0].id);
+      return;
+    }
     if (!chatId && activeId) navigate(`/dashboard/connect/${activeId}`, { replace: true });
-  }, [activeId, chatId, navigate]);
+  }, [activeId, chatId, conversations, navigate]);
 
   function selectConversation(id) {
     setActiveId(id);

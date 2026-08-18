@@ -1,7 +1,11 @@
 import { Bell, CalendarClock, CheckCheck, Megaphone, Send, ShieldAlert } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/Button.jsx';
 import { Card } from '@/components/ui/Card.jsx';
+import { useCampusAlerts } from '@/hooks/useCampusData.js';
+import { useRealtimeInvalidation } from '@/hooks/useRealtimeInvalidation.js';
+import { createCampusAlert } from '@/lib/api.js';
 import { useNotificationStore } from '@/stores/notificationStore.js';
 import { useUiStore } from '@/stores/uiStore.js';
 
@@ -12,30 +16,57 @@ const defaultAlerts = [
 ];
 
 export default function HeadsUpPage() {
+  const queryClient = useQueryClient();
+  const { data: campusAlerts = [] } = useCampusAlerts();
   const notifications = useNotificationStore((state) => state.notifications);
   const addNotification = useNotificationStore((state) => state.addNotification);
   const addToast = useNotificationStore((state) => state.addToast);
   const markAllRead = useNotificationStore((state) => state.markAllRead);
   const openPanel = useUiStore((state) => state.setNotificationPanelOpen);
   const [draft, setDraft] = useState('');
+  const [alertType, setAlertType] = useState('event');
+  const [publishing, setPublishing] = useState(false);
+  const alertKeys = useMemo(() => [['campus-alerts']], []);
+  useRealtimeInvalidation('campus_alerts', alertKeys);
 
   const alerts = useMemo(() => {
     const customAlerts = notifications.map((item) => ({ type: 'event', title: 'Campus update', ...item }));
-    return [...customAlerts, ...defaultAlerts];
-  }, [notifications]);
+    const backendAlerts = campusAlerts.map((item) => ({
+      id: item.id,
+      type: item.alert_type,
+      title: item.title,
+      message: item.message,
+      created_at: item.created_at,
+      is_read: true,
+    }));
+    return [...customAlerts, ...backendAlerts, ...defaultAlerts];
+  }, [campusAlerts, notifications]);
 
-  const sendDemoAlert = (event) => {
+  const publishAlert = async (event) => {
     event.preventDefault();
     const message = draft.trim();
     if (!message) return;
-    addNotification({
-      id: crypto.randomUUID(),
-      message,
-      created_at: 'Just now',
-      is_read: false,
-    });
-    addToast('HeadsUp alert published.', 'success');
-    setDraft('');
+    setPublishing(true);
+    try {
+      const created = await createCampusAlert({
+        title: 'Campus update',
+        message,
+        alertType,
+      });
+      addNotification({
+        id: created.id,
+        message: created.message,
+        created_at: 'Just now',
+        is_read: false,
+      });
+      queryClient.invalidateQueries({ queryKey: ['campus-alerts'] });
+      addToast('HeadsUp alert published.', 'success');
+      setDraft('');
+    } catch (error) {
+      addToast(error.message, 'error');
+    } finally {
+      setPublishing(false);
+    }
   };
 
   return (
@@ -59,6 +90,7 @@ export default function HeadsUpPage() {
                 {alert.type === 'urgent' ? <ShieldAlert size={20} aria-hidden="true" /> : null}
                 {alert.type === 'event' ? <CalendarClock size={20} aria-hidden="true" /> : null}
                 {alert.type === 'safety' ? <Megaphone size={20} aria-hidden="true" /> : null}
+                {alert.type === 'info' ? <Bell size={20} aria-hidden="true" /> : null}
               </div>
               <div>
                 <h2>{alert.title}</h2>
@@ -70,8 +102,14 @@ export default function HeadsUpPage() {
         </div>
 
         <Card className="stack headsup-composer">
-          <h2>Broadcast Demo Alert</h2>
-          <form className="stack" onSubmit={sendDemoAlert}>
+          <h2>Broadcast Alert</h2>
+          <form className="stack" onSubmit={publishAlert}>
+            <select className="textarea-input" value={alertType} onChange={(event) => setAlertType(event.target.value)}>
+              <option value="event">Event</option>
+              <option value="urgent">Urgent</option>
+              <option value="safety">Safety</option>
+              <option value="info">Info</option>
+            </select>
             <textarea
               className="textarea-input"
               rows={5}
@@ -79,8 +117,8 @@ export default function HeadsUpPage() {
               placeholder="Write a notice for students..."
               onChange={(event) => setDraft(event.target.value)}
             />
-            <Button icon={Send} disabled={!draft.trim()}>
-              Publish Alert
+            <Button icon={Send} disabled={!draft.trim() || publishing}>
+              {publishing ? 'Publishing...' : 'Publish Alert'}
             </Button>
           </form>
         </Card>

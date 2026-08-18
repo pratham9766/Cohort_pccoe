@@ -188,3 +188,62 @@ export async function createCalendarEvent(event) {
   if (error) throw error;
   return data;
 }
+
+export async function saveArcadeScore({ score, streak, matches, metadata = {} }) {
+  if (isDemoSessionActive()) {
+    return {
+      id: crypto.randomUUID(),
+      user_id: getDemoActiveUser().id,
+      game_key: 'campus-arcade',
+      score,
+      streak,
+      matches,
+      metadata,
+      created_at: 'now',
+    };
+  }
+  const supabase = requireSupabase();
+  const userId = await getActiveUserId();
+  const { data, error } = await supabase
+    .from('arcade_scores')
+    .insert({
+      user_id: userId,
+      game_key: 'campus-arcade',
+      score,
+      streak,
+      matches,
+      metadata,
+    })
+    .select('*')
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function createCampusAlert({ title = 'Campus update', message, alertType = 'event' }) {
+  if (isDemoSessionActive()) {
+    return {
+      id: crypto.randomUUID(),
+      title,
+      message,
+      alert_type: alertType,
+      author_id: getDemoActiveUser().id,
+      created_at: 'Just now',
+    };
+  }
+  const supabase = requireSupabase();
+  const authorId = await getActiveUserId();
+  const { data, error } = await supabase
+    .from('campus_alerts')
+    .insert({
+      author_id: authorId,
+      title,
+      message,
+      alert_type: alertType,
+      is_published: true,
+    })
+    .select('id, title, message, alert_type, created_at')
+    .single();
+  if (error) throw error;
+  return data;
+}

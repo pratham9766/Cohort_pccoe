@@ -58,3 +58,32 @@ export function useCampusLocations() {
     queryFn: () => (isDemoSessionActive() ? campusLocations : safeSupabaseQuery((db) => db.from('campus_locations').select('*').order('name'))),
   });
 }
+
+export function useCampusAlerts() {
+  return useQuery({
+    queryKey: ['campus-alerts'],
+    queryFn: () =>
+      isDemoSessionActive()
+        ? []
+        : safeSupabaseQuery((db) => db.from('campus_alerts').select('id, title, message, alert_type, created_at').order('starts_at', { ascending: false }).limit(20)),
+  });
+}
+
+export function useArcadeLeaderboard() {
+  return useQuery({
+    queryKey: ['arcade-leaderboard'],
+    queryFn: () =>
+      isDemoSessionActive()
+        ? []
+        : safeSupabaseQuery(
+            (db) =>
+              db
+                .from('arcade_scores')
+                .select('id, score, streak, matches, created_at, user:users(id, full_name, avatar_url, branch)')
+                .eq('game_key', 'campus-arcade')
+                .order('score', { ascending: false })
+                .order('created_at', { ascending: false })
+                .limit(5),
+          ),
+  });
+}

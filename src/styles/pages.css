@@ -1,0 +1,42 @@
+.login-page {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: var(--space-5);
+}
+
+.login-card {
+  display: grid;
+  width: min(420px, 100%);
+  justify-items: center;
+  gap: var(--space-4);
+  padding: var(--space-8);
+  text-align: center;
+}
+
+.login-logo {
+  display: grid;
+  width: 72px;
+  height: 72px;
+  place-items: center;
+  border-radius: var(--radius-xl);
+  background: var(--brand-gradient);
+  box-shadow: var(--shadow-brand);
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 900;
+}
+
+.community-cover {
+  height: 180px;
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(6, 182, 212, 0.12)),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: auto, 36px 36px;
+}
+
+.community-detail {
+  display: grid;
+  gap: var(--space-4);
+}
